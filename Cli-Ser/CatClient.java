@@ -10,7 +10,6 @@ class CatClient{
 			int port = Integer.parseInt(args[1]);
 			BufferedReader br = null;
 			clientSocket = new Socket("CatServer", port);
-			System.out.println("Just connected to " + clientSocket.getRemoteSocketAddress());
 
 			DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
        	  	DataInputStream in = new DataInputStream(clientSocket.getInputStream());
@@ -21,19 +20,15 @@ class CatClient{
 			for(int i = 0; i < 10; ++i){
        		 	out.writeUTF("LINE\n");
         		response = (in.readUTF()).trim();
-				System.out.println(response);
 				line = br.readLine();
 				if (line == null){
 					br = new BufferedReader(new FileReader(filename));
 					line = br.readLine();
 				}
-
-
 				if (response.equals(line.toUpperCase()))
 					System.out.println("OK\n");
 				else
 					System.out.println("MISSING\n");
-
 				try{
 	   			 Thread.sleep(3000);
 				}catch(InterruptedException e){
