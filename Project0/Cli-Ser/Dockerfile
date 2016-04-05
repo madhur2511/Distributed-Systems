@@ -7,5 +7,3 @@ COPY CatClient.java /
 
 RUN javac CatServer.java
 RUN javac CatClient.java
-
-EXPOSE 15000

@@ -5,12 +5,8 @@ public class CatServer{
 	public static void main(String [] args){
 		ServerSocket receiverSocket = null;
 		Socket ss = null;
-
 		try{
 			BufferedReader br = null;
-
-			// TODO: Handle args error separately
-
 			String filename = args[0];
 			int port = Integer.parseInt(args[1]);
 			receiverSocket = new ServerSocket(port);
@@ -39,7 +35,6 @@ public class CatServer{
 				else{
 					System.out.println("Received: " + in.readUTF());
 				}
-
         	}
 		}catch(Exception e){
 			try{

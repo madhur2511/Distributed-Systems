@@ -26,9 +26,9 @@ class CatClient{
 					line = br.readLine();
 				}
 				if (response.equals(line.toUpperCase()))
-					System.out.println("OK\n");
+					System.out.print("OK\n");
 				else
-					System.out.println("MISSING\n");
+					System.out.print("MISSING\n");
 				try{
 	   			 Thread.sleep(3000);
 				}catch(InterruptedException e){
