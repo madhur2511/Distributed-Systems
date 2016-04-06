@@ -21,9 +21,7 @@ public class CatServer{
 				if(req.equals("LINE\n")){
 					if (br == null)
 						br = new BufferedReader(new FileReader(filename));
-
 					line = br.readLine();
-
 					if(line == null){
 						br.close();
 						br = new BufferedReader(new FileReader(filename));

@@ -1,18 +1,5 @@
 #!/bin/bash
 
-# # Creating a Docker Host machine
-# echo "Creating a host machine to run the Docker daemon and engine"
-# docker-machine create --driver virtualbox default1
-#
-# echo "$(docker-machine env default1)" | \
-# { while read -r line
-#     do
-#         eval `echo $line`
-#     done
-# }
-
-#-----------------------------------------------------------------------------------------------
-
 echo "\nBuilding image for client-server from the local context with java files"
 cd Cli-Ser
 docker build -t client-server:v1 . >/dev/null
@@ -56,12 +43,7 @@ echo "THE OVERALL RESULT OF THE TEST IS: $res\n\n"
 #-----------------------------------------------------------------------------------------------
 
 # Clean Up Docker containers and images
-echo "Cleaning up after the tests, removing containers and images"
+echo "Cleaning up after the tests, removing containers and images\n"
 docker rm `docker ps -aq` >/dev/null
 docker rmi client-server:v1 >/dev/null
 docker rmi data-volume:v1 >/dev/null
-
-# Stop and Clean up Docker-Machine called Default1
-# echo "Cleaning up the Docker host machine created\n"
-# docker-machine stop default1
-# docker-machine rm -y default1

@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 
-
 class CatClient{
 	public static void main(String[] args){
 		Socket clientSocket = null;
@@ -30,9 +29,9 @@ class CatClient{
 				else
 					System.out.print("MISSING\n");
 				try{
-	   			 Thread.sleep(3000);
+	   				Thread.sleep(3000);
 				}catch(InterruptedException e){
-   				 System.out.println("got interrupted!");
+   					System.out.println("got interrupted!");
 				}
 			}
 			clientSocket.close();
