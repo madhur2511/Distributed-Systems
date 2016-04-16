@@ -1,6 +1,7 @@
 package rmi;
 
 import java.net.*;
+import java.lang.reflect.*;
 
 /** RMI stub factory.
 
@@ -17,6 +18,13 @@ import java.net.*;
  */
 public abstract class Stub
 {
+    private static Object newInstance(Class c, InetSocketAddress address)
+    {
+        return java.lang.reflect.Proxy.newProxyInstance(
+                                            c.getClassLoader(),
+                                            new Class[] {c},
+                                            new StubProxy(address));
+    }
     /** Creates a stub, given a skeleton with an assigned adress.
 
         <p>
@@ -48,7 +56,13 @@ public abstract class Stub
     public static <T> T create(Class<T> c, Skeleton<T> skeleton)
         throws UnknownHostException
     {
-        throw new UnsupportedOperationException("not implemented");
+        try {
+            return (T) newInstance(c, skeleton.skeletonAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        //throw new UnsupportedOperationException("not implemented");
     }
 
     /** Creates a stub, given a skeleton with an assigned address and a hostname
@@ -84,7 +98,16 @@ public abstract class Stub
     public static <T> T create(Class<T> c, Skeleton<T> skeleton,
                                String hostname)
     {
-        throw new UnsupportedOperationException("not implemented");
+        InetSocketAddress address;
+        try {
+            address = new InetSocketAddress(hostname,
+                                            skeleton.skeletonAddress.getPort());
+            return (T) newInstance(c, address);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        //throw new UnsupportedOperationException("not implemented");
     }
 
     /** Creates a stub, given the address of a remote server.
@@ -106,6 +129,12 @@ public abstract class Stub
      */
     public static <T> T create(Class<T> c, InetSocketAddress address)
     {
-        throw new UnsupportedOperationException("not implemented");
+        try {
+            return (T) newInstance(c, address);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        //throw new UnsupportedOperationException("not implemented");
     }
 }
