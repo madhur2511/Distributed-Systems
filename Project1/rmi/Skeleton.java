@@ -1,5 +1,7 @@
 package rmi;
-
+import java.net.*;
+import rmi.*;
+import rmi.Helper.*;
 import java.net.*;
 
 /** RMI skeleton
@@ -26,6 +28,10 @@ import java.net.*;
 */
 public class Skeleton<T>
 {
+    InetSocketAddress skeletonAddress = null;
+    T serverObject = null;
+    Class<T> classObject = null;
+
     /** Creates a <code>Skeleton</code> with no initial server address. The
         address will be determined by the system when <code>start</code> is
         called. Equivalent to using <code>Skeleton(null)</code>.
@@ -47,7 +53,9 @@ public class Skeleton<T>
      */
     public Skeleton(Class<T> c, T server)
     {
-        throw new UnsupportedOperationException("not implemented");
+        this.serverObject = server;
+        this.classObject = c;
+        //throw new UnsupportedOperationException("not implemented");
     }
 
     /** Creates a <code>Skeleton</code> with the given initial server address.
@@ -70,7 +78,9 @@ public class Skeleton<T>
      */
     public Skeleton(Class<T> c, T server, InetSocketAddress address)
     {
-        throw new UnsupportedOperationException("not implemented");
+        this.serverObject = server;
+        this.classObject = c;
+        this.skeletonAddress = address;
     }
 
     /** Called when the listening thread exits.
@@ -141,7 +151,14 @@ public class Skeleton<T>
      */
     public synchronized void start() throws RMIException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(skeletonAddress == null){
+            skeletonAddress = new InetSocketAddress(11111);
+        }
+        try{
+            new Thread(new MultiThreadedServer(skeletonAddress)).start();
+        }catch(Throwable e){
+            throw new RMIException(e);
+        }
     }
 
     /** Stops the skeleton server, if it is already running.
