@@ -28,6 +28,7 @@ import java.net.*;
 */
 public class Skeleton<T>
 {
+    Listener<T> listener = null;
     InetSocketAddress skeletonAddress = null;
     T serverObject = null;
     Class<T> classObject = null;
@@ -149,16 +150,22 @@ public class Skeleton<T>
                              or when the server has already been started and has
                              not since stopped.
      */
+
     public synchronized void start() throws RMIException
     {
         if(skeletonAddress == null){
             skeletonAddress = new InetSocketAddress(11111);
         }
         try{
-            new Thread(new MultiThreadedServer(skeletonAddress)).start();
+            listener = new Listener<T>(this, skeletonAddress);
+            new Thread(listener).start();
         }catch(Throwable e){
             throw new RMIException(e);
         }
+    }
+
+    public synchronized void newClient(Socket clientSocket){
+        new Thread(new ClientProcessor<T>(clientSocket, serverObject, classObject));
     }
 
     /** Stops the skeleton server, if it is already running.
