@@ -17,12 +17,14 @@ public class TestClient{
         PrintStream os;
         TestInterface proxyTest;
         try {
+            String result;
             addr = new InetSocketAddress(11112);
-            skt = new Socket("127.0.0.1", 11112);
-            os = new PrintStream(skt.getOutputStream());
             proxyTest = Stub.create(TestInterface.class, addr);
-            //String result = proxyTest.testMessage("Hello from proxy");
-            System.out.println("done");
+            result = proxyTest.testMessage("Client1");
+            System.out.println("SUCCESS: Result - "+result);
+            proxyTest = Stub.create(TestInterface.class, addr);
+            result = proxyTest.testMessage("Client2");
+            System.out.println("SUCCESS: Result - "+result);
         } catch (Exception e) {
             e.printStackTrace();
         }

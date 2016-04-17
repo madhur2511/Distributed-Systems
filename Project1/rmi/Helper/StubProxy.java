@@ -20,7 +20,6 @@ public class StubProxy implements InvocationHandler
         Object result = null;
         String str;
         try {
-            // now, find the matching
             Class[] argTypes = new Class[args.length];
             int i = 0;
             for (Object arg : args) {
@@ -29,26 +28,29 @@ public class StubProxy implements InvocationHandler
             Method method = proxy.getClass().getMethod(m.getName(), argTypes);
 
             skt = new Socket(address.getHostName(), address.getPort());
-            is = skt.getInputStream();
-            ois = new ObjectInputStream(is);
             oos = new ObjectOutputStream(skt.getOutputStream());
 
-            // result = m.invoke(proxy, args);
+            // push method and the args onto the ObjectOutputStream
             oos.writeObject(m.getName());
             oos.writeObject(args);
 
+            // create ObjectInputStream and wait for the results.
+            is = skt.getInputStream();
+            ois = new ObjectInputStream(is);
+
             int total = 0;
-            while(total < 120000 && is.available() == 0) {
+            while(total < 30000 && is.available() == 0) {
                 try {
                     Thread.sleep(1000);
                 } catch(InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
                 total = total + 1000;
             }
             if(is.available() != 0) {
                 result = ois.readObject();
             } else {
-                throw new Exception("timed out after 120000ms");
+                throw new Exception("timed out");
             }
 
         } catch (Exception e) {
@@ -56,9 +58,6 @@ public class StubProxy implements InvocationHandler
         }
 
         try {
-            is.close();
-            ois.close();
-            oos.close();
             skt.close();
         }
         catch (IOException e) {

@@ -20,10 +20,12 @@ public abstract class Stub
 {
     private static Object newInstance(Class c, InetSocketAddress address)
     {
-        return java.lang.reflect.Proxy.newProxyInstance(
+        Object obj = java.lang.reflect.Proxy.newProxyInstance(
                                             c.getClassLoader(),
                                             new Class[] {c},
                                             new StubProxy(address));
+        System.out.println("instantiated StubProxy. hostname: "+address.getHostName()+" port: "+address.getPort());
+        return obj;
     }
     /** Creates a stub, given a skeleton with an assigned adress.
 
