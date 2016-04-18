@@ -1,18 +1,12 @@
 package rmi;
 import rmi.*;
 import java.net.*;
-<<<<<<< Updated upstream
+import java.lang.*;
 import java.util.logging.*;
 
 public class TestServer implements TestInterface{
     private static int numCall = 0;
-=======
-import java.lang.*;
-
-public class TestServer implements TestInterface{
-    private static int numCall = 0;
     private static InetSocketAddress addr = null;
->>>>>>> Stashed changes
 
     public String testMessage(String part) throws RMIException{
         numCall += 1;
