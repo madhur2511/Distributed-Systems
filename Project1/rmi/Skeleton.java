@@ -3,6 +3,7 @@ import java.net.*;
 import rmi.*;
 import rmi.Helper.*;
 import java.net.*;
+import java.util.logging.*;
 
 /** RMI skeleton
 
@@ -32,6 +33,7 @@ public class Skeleton<T>
     protected InetSocketAddress skeletonAddress = null;
     protected T serverObject = null;
     protected Class<T> classObject = null;
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     /** Creates a <code>Skeleton</code> with no initial server address. The
         address will be determined by the system when <code>start</code> is
@@ -165,7 +167,7 @@ public class Skeleton<T>
     }
 
     public synchronized void newClient(Socket clientSocket){
-        System.out.println("Spawning a thread for the new client " + clientSocket);
+        logger.log(Level.INFO, "Spawning a thread for the new client: " + clientSocket);
         new Thread(new ClientProcessor<T>(clientSocket, serverObject, classObject)).start();
     }
 

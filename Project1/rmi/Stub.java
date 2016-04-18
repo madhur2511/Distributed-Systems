@@ -2,6 +2,7 @@ package rmi;
 
 import java.net.*;
 import java.lang.reflect.*;
+import java.util.logging.*;
 
 /** RMI stub factory.
 
@@ -18,13 +19,15 @@ import java.lang.reflect.*;
  */
 public abstract class Stub
 {
+    private static Logger logger = Logger.getLogger(Stub.class.getName());
+
     private static Object newInstance(Class c, InetSocketAddress address)
     {
         Object obj = java.lang.reflect.Proxy.newProxyInstance(
                                             c.getClassLoader(),
                                             new Class[] {c},
                                             new StubProxy(address));
-        System.out.println("instantiated StubProxy. hostname: " + address.getAddress() + " port: " + address.getPort());
+        logger.log(Level.INFO, "instantiated proxy for server running at: " + address.getAddress() + ":" + address.getPort());
         return obj;
     }
     /** Creates a stub, given a skeleton with an assigned adress.
