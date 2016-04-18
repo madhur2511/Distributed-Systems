@@ -1,9 +1,11 @@
 package rmi;
 import rmi.*;
 import java.net.*;
+import java.util.logging.*;
 
 public class TestServer implements TestInterface{
     private static int numCall = 0;
+
     public String testMessage(String part) throws RMIException{
         numCall += 1;
         return "MK " + part + ", you are caller number " + numCall;

@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import rmi.Helper.*;
 import java.lang.reflect.*;
+import java.util.logging.*;
 
 public class ClientProcessor<T> implements Runnable{
     private final Socket clientSocket;
@@ -11,6 +12,7 @@ public class ClientProcessor<T> implements Runnable{
     protected Class<T> classObject = null;
     protected ObjectInputStream ois = null;
     protected ObjectOutputStream oos = null;
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public ClientProcessor(Socket clientSocket, T serverObject, Class<T> classObject) {
         this.clientSocket = clientSocket;
@@ -19,7 +21,7 @@ public class ClientProcessor<T> implements Runnable{
     }
 
     public void run() {
-        System.out.println("Got a client !" + clientSocket);
+        logger.log(Level.INFO, "Got a client: " + clientSocket);
 
         try{
             ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -36,6 +38,9 @@ public class ClientProcessor<T> implements Runnable{
                 synchronized(serverObject){
                     Method m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
+                    logger.log(Level.INFO, "Invoked method: " + m + " with args: " + msgObj.getArgs() +
+                                            " result: " + returnObj);
+
                 }
                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 if (returnObj != null)
