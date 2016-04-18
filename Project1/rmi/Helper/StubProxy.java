@@ -12,8 +12,9 @@ public class StubProxy implements InvocationHandler
 {
     private final int MAX_WAIT = 30;        // total timeout = 30 * 2000 = 60secs
     private final int SLEEPTIME = 2000;     // 2 secs
+    private final boolean INVOKE_SUCCESS = true;
+    private final boolean INVOKE_FAILURE = false;
     private final InetSocketAddress address;
-
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public StubProxy(InetSocketAddress address) {
@@ -27,6 +28,7 @@ public class StubProxy implements InvocationHandler
         ObjectInputStream ois = null;
         ObjectOutputStream oos = null;
         Object result = null;
+        boolean invoke_status = true;
         String str;
         Method method = null;
 
@@ -38,24 +40,20 @@ public class StubProxy implements InvocationHandler
             }
             method = proxy.getClass().getMethod(m.getName(), argTypes);
             if (method == null)
-                logger.log(Level.WARNING, "Could not find a matching mathod: " + m + " with args: " + args);
-
-
+                logger.log(Level.WARNING, "Could not find a matching method. METHOD: " + m + " ARGS: " + args);
 
             socket = new Socket(address.getAddress(), address.getPort());
-            logger.log(Level.INFO, "Connected to server running at: "
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
+            is = socket.getInputStream();
+            ois = new ObjectInputStream(is);
+            logger.log(Level.INFO, "Connected to SERVER: "
                                     + address.getAddress() + ":" + address.getPort());
 
             Message msg = new Message();
             msg.setMethodName(method.getName());
             msg.setArgs(args);
-
-            oos = new ObjectOutputStream(socket.getOutputStream());
             oos.writeObject(msg);
-            logger.log(Level.INFO, "Message sent to server: " + msg);
-
-            is = socket.getInputStream();
-            ois = new ObjectInputStream(is);
 
             i = 0;
             while(i < MAX_WAIT && is.available() == 0) {
@@ -68,26 +66,27 @@ public class StubProxy implements InvocationHandler
             }
 
             if (is.available() != 0) {
+                invoke_status = (boolean) ois.readObject();
                 result = ois.readObject();
-                logger.log(Level.INFO, "Results of the method: " + method + " are" + result);
+                logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
+                                       " METHOD: " + method + " RESULT: " + result);
             } else {
-                logger.log(Level.WARNING, "Call to method: " + method + " on server: " +
-                                        address.getAddress() + ":" + address.getPort() +
-                                        " timed out.");
-                throw new Exception("timed out");
+                logger.log(Level.WARNING, "Remote Invocation timed out. METHOD: " + method + " SERVER: " +
+                                          address.getAddress() + ":" + address.getPort());
+                throw new Exception("RMI timed out");
             }
-
-            return result;
-
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            }
+            catch (IOException e) {
+                System.out.println(e);
+            }
         }
-
-        try {
-            socket.close();
-        }
-        catch (IOException e) {
-            System.out.println(e);
+        if (invoke_status != INVOKE_SUCCESS) {
+            throw (Throwable)result;
         }
         return result;
     }

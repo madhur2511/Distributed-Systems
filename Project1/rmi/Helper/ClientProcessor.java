@@ -8,11 +8,14 @@ import java.util.logging.*;
 
 public class ClientProcessor<T> implements Runnable{
     private final Socket clientSocket;
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final boolean INVOKE_SUCCESS = true;
+    private final boolean INVOKE_FAILURE = false;
+
     protected T serverObject = null;
     protected Class<T> classObject = null;
     protected ObjectInputStream ois = null;
     protected ObjectOutputStream oos = null;
-    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public ClientProcessor(Socket clientSocket, T serverObject, Class<T> classObject) {
         this.clientSocket = clientSocket;
@@ -21,47 +24,72 @@ public class ClientProcessor<T> implements Runnable{
     }
 
     public void run() {
+        Object readObj = null;
+        Object returnObj = null;
+        Message msgObj = null;
+        Method m = null;
+
         logger.log(Level.INFO, "Got a client: " + clientSocket);
 
-        try{
+        try {
+            oos = new ObjectOutputStream(clientSocket.getOutputStream());
+            oos.flush();
             ois = new ObjectInputStream(clientSocket.getInputStream());
-            Object readObj = ois.readObject();
+            readObj = ois.readObject();
 
-            if(readObj instanceof Message){
-                Message msgObj = (Message)readObj;
+            if (readObj instanceof Message) {
+                msgObj = (Message)readObj;
                 Class[] argTypes = new Class[msgObj.getArgs().length];
                 int i = 0;
                 for (Object arg : msgObj.getArgs()) {
                     argTypes[i++] = arg.getClass();
                 }
-                Object returnObj = null;
-                synchronized(serverObject){
-                    Method m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
+
+                synchronized(serverObject) {
+                    m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
-                    logger.log(Level.INFO, "Invoked method: " + m + " with args: " + msgObj.getArgs() +
-                                            " result: " + returnObj);
+                    oos.writeObject(INVOKE_SUCCESS);
+                    oos.writeObject(returnObj);
+                    logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
+                                            " RESULT: " + returnObj);
 
                 }
-                oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                if (returnObj != null)
-                    oos.writeObject(returnObj);
             }
-        }catch (IOException e) {
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //} catch (ClassNotFoundException e) {
+        //    e.printStackTrace();
+        //} catch (NoSuchMethodException e) {
+        //    e.printStackTrace();
+        //} catch (IllegalAccessException e) {
+        //    e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
+                                      " ARGS: " + msgObj.getArgs() +
+                                      " EXCEPTION: " + e.getMessage());
+            try {
+                oos.writeObject(INVOKE_FAILURE);
+                oos.writeObject(e);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Non-Invocation Exception, METHOD: " + m +
+                                      " ARGS: " + msgObj.getArgs() +
+                                      " EXCEPTION: " + e.getMessage());
+            try {
+                oos.writeObject(INVOKE_FAILURE);
+                oos.writeObject(e);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
-        }catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }catch(NoSuchMethodException e){
-            e.printStackTrace();
-        }catch(IllegalAccessException e){
-            e.printStackTrace();
-        }catch(InvocationTargetException e){
-            e.printStackTrace();
-        }
-
-        try {
-            clientSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

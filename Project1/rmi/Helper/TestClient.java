@@ -24,8 +24,9 @@ public class TestClient{
             proxyTest = Stub.create(TestInterface.class, addr);
 
             result = proxyTest.testMessage("Hello");
-
+            System.out.println("SUCCESS: Result : " + result);
             System.out.println("SUCCESS: Result : " + proxyTest.addNum(1, 3));
+            result = proxyTest.exceptionThrower("junk");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -17,6 +17,10 @@ public class TestServer implements TestInterface{
         return a + b;
     }
 
+    public String exceptionThrower(String msg) throws RMIException {
+        throw new RMIException("Exception: " + msg);
+    }
+
     public static void main(String[] args) throws RMIException{
         TestServer server = new TestServer();
         //try{
