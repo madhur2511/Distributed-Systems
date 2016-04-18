@@ -24,7 +24,7 @@ public abstract class Stub
                                             c.getClassLoader(),
                                             new Class[] {c},
                                             new StubProxy(address));
-        System.out.println("instantiated StubProxy. hostname: "+address.getHostName()+" port: "+address.getPort());
+        System.out.println("instantiated StubProxy. hostname: " + address.getHostName() + " port: " + address.getPort());
         return obj;
     }
     /** Creates a stub, given a skeleton with an assigned adress.
@@ -132,7 +132,7 @@ public abstract class Stub
     public static <T> T create(Class<T> c, InetSocketAddress address)
     {
         try {
-            return (T) newInstance(c, address);
+            return (T)newInstance(c, address);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

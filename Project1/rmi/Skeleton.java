@@ -28,10 +28,10 @@ import java.net.*;
 */
 public class Skeleton<T>
 {
-    Listener<T> listener = null;
-    InetSocketAddress skeletonAddress = null;
-    T serverObject = null;
-    Class<T> classObject = null;
+    protected Thread listenerThread = null;
+    protected InetSocketAddress skeletonAddress = null;
+    protected T serverObject = null;
+    protected Class<T> classObject = null;
 
     /** Creates a <code>Skeleton</code> with no initial server address. The
         address will be determined by the system when <code>start</code> is
@@ -157,8 +157,8 @@ public class Skeleton<T>
             skeletonAddress = new InetSocketAddress(11111);
         }
         try{
-            listener = new Listener<T>(this, skeletonAddress);
-            new Thread(listener).start();
+            listenerThread = new Thread(new Listener<T>(this, skeletonAddress));
+            listenerThread.start();
         }catch(Throwable e){
             throw new RMIException(e);
         }
@@ -179,6 +179,8 @@ public class Skeleton<T>
      */
     public synchronized void stop()
     {
-        throw new UnsupportedOperationException("not implemented");
+        listenerThread.interrupt();
+        // this.stopped(new Throwable ());
+        //throw new UnsupportedOperationException("not implemented");
     }
 }

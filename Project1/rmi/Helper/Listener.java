@@ -19,7 +19,7 @@ public class Listener<T> implements Runnable{
     public void run() {
         try{
             ServerSocket listener = new ServerSocket(address.getPort(), BACKLOG, address.getAddress());
-            while(true){
+            while(!Thread.currentThread().isInterrupted()){
                 Socket clientSocket = listener.accept();
                 System.out.println("Connected");
                 skeletonReference.newClient(clientSocket);
