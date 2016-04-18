@@ -6,9 +6,9 @@ import rmi.Helper.*;
 
 public class Listener<T> implements Runnable{
     private final int BACKLOG = 50;
-    private ServerSocket listener = null;
-    private InetSocketAddress address = null;
-    private Skeleton<T> skeletonReference = null;
+    protected ServerSocket listener = null;
+    protected InetSocketAddress address = null;
+    protected Skeleton<T> skeletonReference = null;
 
     public Listener(Skeleton<T> skeletonReference, InetSocketAddress address){
         this.address = address;

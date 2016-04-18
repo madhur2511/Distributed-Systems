@@ -20,6 +20,7 @@ public class ClientProcessor<T> implements Runnable{
 
     public void run() {
         System.out.println("Got a client !" + clientSocket);
+
         try{
             ois = new ObjectInputStream(clientSocket.getInputStream());
             Object readObj = ois.readObject();

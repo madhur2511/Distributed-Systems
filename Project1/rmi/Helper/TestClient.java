@@ -13,16 +13,15 @@ public class TestClient{
     // String response = proxyObj.testMessage("Hello ");
 
     public static void main(String[] args) throws RMIException{
-        InetSocketAddress addr;
         Socket skt;
         PrintStream os;
         TestInterface proxyTest;
         try {
             String result;
-            addr = new InetSocketAddress(11111);
+            InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 11111);
             proxyTest = Stub.create(TestInterface.class, addr);
             result = proxyTest.testMessage("Hello");
-            System.out.println("SUCCESS: Result - "+result);
+            System.out.println("SUCCESS: Result - " + result);
 
         } catch (Exception e) {
             e.printStackTrace();

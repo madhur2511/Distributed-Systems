@@ -24,7 +24,7 @@ public abstract class Stub
                                             c.getClassLoader(),
                                             new Class[] {c},
                                             new StubProxy(address));
-        System.out.println("instantiated StubProxy. hostname: " + address.getHostName() + " port: " + address.getPort());
+        System.out.println("instantiated StubProxy. hostname: " + address.getAddress() + " port: " + address.getPort());
         return obj;
     }
     /** Creates a stub, given a skeleton with an assigned adress.
@@ -97,8 +97,7 @@ public abstract class Stub
                       <code>RMIException</code>, or if an object implementing
                       this interface cannot be dynamically created.
      */
-    public static <T> T create(Class<T> c, Skeleton<T> skeleton,
-                               String hostname)
+    public static <T> T create(Class<T> c, Skeleton<T> skeleton, String hostname)
     {
         InetSocketAddress address;
         try {

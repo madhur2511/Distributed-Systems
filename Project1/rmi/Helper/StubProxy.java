@@ -30,7 +30,7 @@ public class StubProxy implements InvocationHandler
             }
             Method method = proxy.getClass().getMethod(m.getName(), argTypes);
 
-            socket = new Socket(address.getHostName(), address.getPort());
+            socket = new Socket(address.getAddress(), address.getPort());
             Message msg = new Message();
             msg.setMethodName(method.getName());
             msg.setArgs(args);
@@ -46,7 +46,7 @@ public class StubProxy implements InvocationHandler
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         try {
             socket.close();
         }
