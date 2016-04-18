@@ -2,6 +2,8 @@ package rmi;
 import rmi.*;
 import java.io.*;
 import java.net.*;
+import java.util.*;
+import java.lang.*;
 import rmi.Helper.*;
 import java.lang.reflect.*;
 import java.util.logging.*;
@@ -11,7 +13,12 @@ public class StubProxy implements InvocationHandler
     private final int MAX_WAIT = 30;        // total timeout = 30 * 2000 = 60secs
     private final int SLEEPTIME = 2000;     // 2 secs
     private final InetSocketAddress address;
+<<<<<<< Updated upstream
     private Logger logger = Logger.getLogger(this.getClass().getName());
+=======
+    Class[] primitiveWrappers = {Boolean.class, Byte.class, Character.class, Short.class, Integer.class,
+                                 Long.class, Double.class, Float.class};
+>>>>>>> Stashed changes
 
     public StubProxy(InetSocketAddress address) {
         this.address = address;
@@ -33,9 +40,14 @@ public class StubProxy implements InvocationHandler
             for (Object arg : args) {
                 argTypes[i++] = arg.getClass();
             }
+<<<<<<< Updated upstream
             method = proxy.getClass().getMethod(m.getName(), argTypes);
             if (method == null)
                 logger.log(Level.WARNING, "Could not find a matching mathod: " + m + " with args: " + args);
+=======
+
+            Method method = proxy.getClass().getMethod(m.getName(), argTypes);
+>>>>>>> Stashed changes
 
             socket = new Socket(address.getAddress(), address.getPort());
             logger.log(Level.INFO, "Connected to server running at: "

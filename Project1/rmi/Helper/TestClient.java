@@ -20,9 +20,12 @@ public class TestClient{
         TestInterface proxyTest;
         try {
             String result;
-            InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 11111);
+            InetSocketAddress addr = new InetSocketAddress(7000);
             proxyTest = Stub.create(TestInterface.class, addr);
+
             result = proxyTest.testMessage("Hello");
+
+            System.out.println("SUCCESS: Result : " + proxyTest.addNum(1, 3));
 
         } catch (Exception e) {
             e.printStackTrace();

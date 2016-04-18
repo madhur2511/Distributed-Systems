@@ -21,7 +21,11 @@ public class ClientProcessor<T> implements Runnable{
     }
 
     public void run() {
+<<<<<<< Updated upstream
         logger.log(Level.INFO, "Got a client: " + clientSocket);
+=======
+        System.out.println("Got a client " + clientSocket);
+>>>>>>> Stashed changes
 
         try{
             ois = new ObjectInputStream(clientSocket.getInputStream());
