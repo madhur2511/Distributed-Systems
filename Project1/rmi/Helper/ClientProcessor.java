@@ -22,8 +22,8 @@ public class ClientProcessor<T> implements Runnable{
         System.out.println("Got a client !" + clientSocket);
         try{
             ois = new ObjectInputStream(clientSocket.getInputStream());
-            oos = new ObjectOutputStream(clientSocket.getOutputStream());
             Object readObj = ois.readObject();
+
             if(readObj instanceof Message){
                 Message msgObj = (Message)readObj;
                 Class[] argTypes = new Class[msgObj.getArgs().length];
@@ -36,6 +36,7 @@ public class ClientProcessor<T> implements Runnable{
                     Method m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
                 }
+                oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 if (returnObj != null)
                     oos.writeObject(returnObj);
             }
