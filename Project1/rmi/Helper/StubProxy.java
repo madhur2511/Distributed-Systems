@@ -1,19 +1,14 @@
-package rmi;
-import rmi.*;
+package rmi.Helper;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.lang.*;
-import rmi.Helper.*;
+import rmi.*;
 import java.lang.reflect.*;
 import java.util.logging.*;
 
 public class StubProxy implements InvocationHandler
 {
-    private final int MAX_WAIT = 30;        // total timeout = 30 * 2000 = 60secs
-    private final int SLEEPTIME = 2000;     // 2 secs
-    private final boolean INVOKE_SUCCESS = true;
-    private final boolean INVOKE_FAILURE = false;
     private final InetSocketAddress address;
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -61,9 +56,9 @@ public class StubProxy implements InvocationHandler
             oos.writeObject(msg);
 
             int i = 0;
-            while(i < MAX_WAIT && is.available() == 0) {
+            while(i < Utility.MAX_WAIT && is.available() == 0) {
                 try {
-                    Thread.sleep(SLEEPTIME);
+                    Thread.sleep(Utility.SLEEPTIME);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
@@ -90,7 +85,7 @@ public class StubProxy implements InvocationHandler
                 System.out.println(e);
             }
         }
-        if (invoke_status != INVOKE_SUCCESS) {
+        if (invoke_status != Utility.INVOKE_SUCCESS) {
             throw (Throwable)result;
         }
         return result;

@@ -2,15 +2,12 @@ package rmi.Helper;
 import rmi.*;
 import java.io.*;
 import java.net.*;
-import rmi.Helper.*;
 import java.lang.reflect.*;
 import java.util.logging.*;
 
 public class ClientProcessor<T> implements Runnable{
     private final Socket clientSocket;
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    private final boolean INVOKE_SUCCESS = true;
-    private final boolean INVOKE_FAILURE = false;
 
     protected T serverObject = null;
     protected Class<T> classObject = null;
@@ -51,7 +48,7 @@ public class ClientProcessor<T> implements Runnable{
                     m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
                 }
-                oos.writeObject(INVOKE_SUCCESS);
+                oos.writeObject(Utility.INVOKE_SUCCESS);
                 oos.writeObject(returnObj);
                 logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
                                         " RESULT: " + returnObj);
@@ -70,7 +67,7 @@ public class ClientProcessor<T> implements Runnable{
                                       " ARGS: " + msgObj.getArgs() +
                                       " EXCEPTION: " + e.getMessage());
             try {
-                oos.writeObject(INVOKE_FAILURE);
+                oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(e);
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -83,7 +80,7 @@ public class ClientProcessor<T> implements Runnable{
                                       " ARGS: " + msgObj.getArgs() +
                                       " EXCEPTION: " + e.getMessage());
             try {
-                oos.writeObject(INVOKE_FAILURE);
+                oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(e);
             } catch (IOException e1) {
                 e1.printStackTrace();

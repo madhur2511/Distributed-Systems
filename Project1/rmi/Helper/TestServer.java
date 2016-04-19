@@ -1,5 +1,4 @@
 package rmi;
-import rmi.*;
 import java.io.*;
 import java.net.*;
 import java.lang.*;

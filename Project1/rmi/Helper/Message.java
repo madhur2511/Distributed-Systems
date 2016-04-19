@@ -2,7 +2,6 @@ package rmi.Helper;
 import java.net.*;
 import java.io.*;
 import rmi.*;
-import rmi.Helper.*;
 
 public class Message implements Serializable{
     private String methodName = null;

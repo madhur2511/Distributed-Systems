@@ -1,5 +1,5 @@
 package rmi;
-
+import rmi.Helper.*;
 import java.net.*;
 import java.lang.reflect.*;
 import java.util.logging.*;
@@ -61,13 +61,19 @@ public abstract class Stub
     public static <T> T create(Class<T> c, Skeleton<T> skeleton)
         throws UnknownHostException
     {
-        try {
-            return (T) newInstance(c, skeleton.skeletonAddress);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        //throw new UnsupportedOperationException("not implemented");
+        InetSocketAddress addr = null;
+
+        if (c == null || skeleton == null)
+            throw new NullPointerException("Stub.create() called with null parameters");
+
+        if (!Utility.isValidRemoteInterface(c))
+            throw new Error("Class interface is not a remote interface");
+
+        addr = skeleton.getAddress();
+        if (addr == null)
+            throw new IllegalStateException("Skeleton is in invalid state");
+
+        return (T) newInstance(c, addr);
     }
 
     /** Creates a stub, given a skeleton with an assigned address and a hostname
@@ -102,16 +108,21 @@ public abstract class Stub
      */
     public static <T> T create(Class<T> c, Skeleton<T> skeleton, String hostname)
     {
-        InetSocketAddress address;
-        try {
-            address = new InetSocketAddress(hostname,
-                                            skeleton.skeletonAddress.getPort());
-            return (T) newInstance(c, address);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        //throw new UnsupportedOperationException("not implemented");
+        InetSocketAddress addr = null;
+        InetSocketAddress serverAddr = null;
+
+        if (c == null || skeleton == null || hostname == null)
+            throw new NullPointerException("Stub.create() called with null parameters");
+
+        if (!Utility.isValidRemoteInterface(c))
+            throw new Error("Class interface is not a remote interface");
+
+        addr = skeleton.getAddress();
+        if (addr == null)
+            throw new IllegalStateException("Skeleton is in invalid state");
+
+        serverAddr = new InetSocketAddress(hostname, addr.getPort());
+        return (T) newInstance(c, serverAddr);
     }
 
     /** Creates a stub, given the address of a remote server.
@@ -133,12 +144,12 @@ public abstract class Stub
      */
     public static <T> T create(Class<T> c, InetSocketAddress address)
     {
-        try {
-            return (T)newInstance(c, address);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        //throw new UnsupportedOperationException("not implemented");
+        if (c == null || address == null)
+            throw new NullPointerException("Stub.create() called with null parameters");
+
+        if (!Utility.isValidRemoteInterface(c))
+            throw new Error("Class interface is not a remote interface");
+
+        return (T)newInstance(c, address);
     }
 }

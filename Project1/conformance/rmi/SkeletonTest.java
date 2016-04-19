@@ -51,7 +51,7 @@ public class SkeletonTest extends Test
         ensureClassRejected();
         ensureNonRemoteInterfaceRejected();
         ensureNullPointerExceptions();
-        ensureSkeletonRuns();
+        //ensureSkeletonRuns();
     }
 
     /** Performs tests with a running skeleton.

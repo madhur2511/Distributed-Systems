@@ -1,6 +1,4 @@
 package rmi;
-import rmi.*;
-import java.net.*;
 import java.net.*;
 import rmi.Helper.*;
 import java.lang.reflect.*;
@@ -36,6 +34,10 @@ public class Skeleton<T>
     protected Class<T> classObject = null;
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
+    public InetSocketAddress getAddress() {
+        return skeletonAddress;
+    }
+
     /** Creates a <code>Skeleton</code> with no initial server address. The
         address will be determined by the system when <code>start</code> is
         called. Equivalent to using <code>Skeleton(null)</code>.
@@ -60,7 +62,7 @@ public class Skeleton<T>
         if (c == null || server == null)
             throw new NullPointerException("Either class interface or server instance is missing");
 
-        if (!checkRemoteInterfaceImplementation(c))
+        if (!Utility.isValidRemoteInterface(c))
             throw new Error("The type variable given doesnt represent a remote interface");
 
         this.serverObject = server;
@@ -91,7 +93,7 @@ public class Skeleton<T>
         if (c == null || server == null)
             throw new NullPointerException("Either class interface or server instance missing");
 
-        if (!checkRemoteInterfaceImplementation(c))
+        if (!Utility.isValidRemoteInterface(c))
             throw new Error();
 
         this.serverObject = server;
@@ -206,15 +208,5 @@ public class Skeleton<T>
                this.stopped(null);
             }
         }
-    }
-
-    private synchronized boolean checkRemoteInterfaceImplementation(Class<T> c){
-        Method[] methods = c.getMethods();
-        int count = 0;
-        for (Method method : methods)
-            for (Class exceptionClass : method.getExceptionTypes())
-                if (exceptionClass == RMIException.class)
-                    count += 1;
-        return count == methods.length ? true : false;
     }
 }
