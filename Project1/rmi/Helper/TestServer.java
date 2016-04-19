@@ -32,6 +32,6 @@ public class TestServer implements TestInterface{
         //}catch(UnknownHostException e){
         //    e.printStackTrace();
         //}
-        //skeleton.stop();
+        skeleton.stop();
     }
 }

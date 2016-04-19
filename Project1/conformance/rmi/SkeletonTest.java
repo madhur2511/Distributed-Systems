@@ -48,9 +48,9 @@ public class SkeletonTest extends Test
     @Override
     protected void perform() throws TestFailed
     {
-        //ensureClassRejected();
-        //ensureNonRemoteInterfaceRejected();
-        //ensureNullPointerExceptions();
+        ensureClassRejected();
+        ensureNonRemoteInterfaceRejected();
+        ensureNullPointerExceptions();
         ensureSkeletonRuns();
     }
 

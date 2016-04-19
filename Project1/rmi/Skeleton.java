@@ -195,23 +195,21 @@ public class Skeleton<T>
      */
     public synchronized void stop()
     {
-        listenerThread.interrupt();
-        // this.stopped(new Throwable ());
-        //throw new UnsupportedOperationException("not implemented");
-    }
-
-    private boolean checkRemoteInterfaceImplementation(Class<T> c){
-        Method[] methods = c.getMethods();
-        int count = 0;
-        for (Method method : methods){
-            for (Class exceptionClass : method.getExceptionTypes()){
-                if (exceptionClass == RMIException.class)
-                    count += 1;
+        if (listenerThread != null){
+            listenerThread.interrupt();
+            if (listenerThread.getState() == Thread.State.TERMINATED){
+               this.stopped(null);
             }
         }
-        if (count == methods.length)
-            return true;
-        else
-            return false;
+    }
+
+    private synchronized boolean checkRemoteInterfaceImplementation(Class<T> c){
+        Method[] methods = c.getMethods();
+        int count = 0;
+        for (Method method : methods)
+            for (Class exceptionClass : method.getExceptionTypes())
+                if (exceptionClass == RMIException.class)
+                    count += 1;
+        return count == methods.length ? true : false;
     }
 }
