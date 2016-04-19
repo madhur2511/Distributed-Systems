@@ -36,7 +36,8 @@ public class ClientProcessor<T> implements Runnable{
             oos.flush();
 
             ois = new ObjectInputStream(clientSocket.getInputStream());
-            readObj = ois.readObject();
+            if(!this.clientSocket.isClosed())
+                readObj = ois.readObject();
 
             if (readObj instanceof Message) {
                 msgObj = (Message)readObj;
@@ -55,6 +56,7 @@ public class ClientProcessor<T> implements Runnable{
                 logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
                                         " RESULT: " + returnObj);
             }
+        }
         //} catch (IOException e) {
         //    e.printStackTrace();
         //} catch (ClassNotFoundException e) {
@@ -63,7 +65,7 @@ public class ClientProcessor<T> implements Runnable{
         //    e.printStackTrace();
         //} catch (IllegalAccessException e) {
         //    e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        catch (InvocationTargetException e) {
             logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
                                       " ARGS: " + msgObj.getArgs() +
                                       " EXCEPTION: " + e.getMessage());

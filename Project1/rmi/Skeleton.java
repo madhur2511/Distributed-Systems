@@ -174,6 +174,11 @@ public class Skeleton<T>
         try{
             listenerThread = new Thread(new Listener<T>(this, skeletonAddress));
             listenerThread.start();
+            try{
+                Thread.sleep(10);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }catch(Throwable e){
             throw new RMIException(e);
         }

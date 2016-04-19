@@ -21,15 +21,24 @@ public class Listener<T> implements Runnable{
 
     public void run() {
         try{
-            ServerSocket listener = new ServerSocket(address.getPort(), BACKLOG, address.getAddress());
+            listener = new ServerSocket(address.getPort(), BACKLOG, address.getAddress());
             while(!Thread.currentThread().isInterrupted()){
                 Socket clientSocket = listener.accept();
+                System.out.println("Connected to client: " + clientSocket.getInetAddress());
+
                 logger.log(Level.INFO, "Connected to client: " + clientSocket.getInetAddress());
                 skeletonReference.newClient(clientSocket);
             }
+            listener.close();
         }
-        catch(IOException e){
-            System.out.println(e);
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{
+                if(!listener.isClosed())
+                    listener.close();
+            }catch(Exception e){}
         }
     }
 }
