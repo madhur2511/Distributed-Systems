@@ -1,8 +1,9 @@
 package rmi;
-import java.net.*;
 import rmi.*;
-import rmi.Helper.*;
 import java.net.*;
+import java.net.*;
+import rmi.Helper.*;
+import java.lang.reflect.*;
 import java.util.logging.*;
 
 /** RMI skeleton
@@ -56,6 +57,12 @@ public class Skeleton<T>
      */
     public Skeleton(Class<T> c, T server)
     {
+        if (c == null || server == null)
+            throw new NullPointerException("Either class interface or server instance is missing");
+
+        if (!checkRemoteInterfaceImplementation(c))
+            throw new Error("The type variable given doesnt represent a remote interface");
+
         this.serverObject = server;
         this.classObject = c;
         //throw new UnsupportedOperationException("not implemented");
@@ -81,6 +88,12 @@ public class Skeleton<T>
      */
     public Skeleton(Class<T> c, T server, InetSocketAddress address)
     {
+        if (c == null || server == null)
+            throw new NullPointerException("Either class interface or server instance missing");
+
+        if (!checkRemoteInterfaceImplementation(c))
+            throw new Error();
+
         this.serverObject = server;
         this.classObject = c;
         this.skeletonAddress = address;
@@ -185,5 +198,20 @@ public class Skeleton<T>
         listenerThread.interrupt();
         // this.stopped(new Throwable ());
         //throw new UnsupportedOperationException("not implemented");
+    }
+
+    private boolean checkRemoteInterfaceImplementation(Class<T> c){
+        Method[] methods = c.getMethods();
+        int count = 0;
+        for (Method method : methods){
+            for (Class exceptionClass : method.getExceptionTypes()){
+                if (exceptionClass == RMIException.class)
+                    count += 1;
+            }
+        }
+        if (count == methods.length)
+            return true;
+        else
+            return false;
     }
 }

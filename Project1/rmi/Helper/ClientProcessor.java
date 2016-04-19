@@ -34,6 +34,7 @@ public class ClientProcessor<T> implements Runnable{
         try {
             oos = new ObjectOutputStream(clientSocket.getOutputStream());
             oos.flush();
+
             ois = new ObjectInputStream(clientSocket.getInputStream());
             readObj = ois.readObject();
 
@@ -48,12 +49,11 @@ public class ClientProcessor<T> implements Runnable{
                 synchronized(serverObject) {
                     m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
-                    oos.writeObject(INVOKE_SUCCESS);
-                    oos.writeObject(returnObj);
-                    logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
-                                            " RESULT: " + returnObj);
-
                 }
+                oos.writeObject(INVOKE_SUCCESS);
+                oos.writeObject(returnObj);
+                logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
+                                        " RESULT: " + returnObj);
             }
         //} catch (IOException e) {
         //    e.printStackTrace();
@@ -73,7 +73,10 @@ public class ClientProcessor<T> implements Runnable{
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        } catch (SocketException e) {
+            logger.log(Level.WARNING, "Socket Connection Error: " + e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             logger.log(Level.WARNING, "Non-Invocation Exception, METHOD: " + m +
                                       " ARGS: " + msgObj.getArgs() +
                                       " EXCEPTION: " + e.getMessage());
