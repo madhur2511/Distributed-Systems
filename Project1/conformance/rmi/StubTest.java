@@ -91,7 +91,7 @@ public class StubTest extends Test
         ensureClassRejected();
         ensureNonRemoteInterfaceRejected();
         ensureNullPointerExceptions();
-        //ensureLocalMethods();
+        ensureLocalMethods();
 
         skeleton.stop();
 

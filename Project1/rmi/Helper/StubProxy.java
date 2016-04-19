@@ -1,6 +1,7 @@
 package rmi.Helper;
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.lang.*;
 import rmi.*;
@@ -18,6 +19,18 @@ public class StubProxy implements InvocationHandler
 
     public Object invoke(Object proxy, Method m, Object[] args) throws Throwable
     {
+        try {
+            if (Utility.isValidRemoteMethod(m))
+                return remoteInvoke(proxy, m, args);
+            else
+                return localInvoke(proxy, m, args);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    private Object remoteInvoke(Object proxy, Method m, Object[] args) throws Throwable
+    {
         Socket socket = null;
         InputStream is = null;
         ObjectInputStream ois = null;
@@ -29,7 +42,6 @@ public class StubProxy implements InvocationHandler
 
         try {
             Class[] argTypes = m.getParameterTypes();
-
 
             /* TODO:
                 Make primitive types work by using the idea printed below
@@ -89,5 +101,49 @@ public class StubProxy implements InvocationHandler
             throw (Throwable)result;
         }
         return result;
+    }
+
+    private Object localInvoke(Object proxy, Method m, Object[] args) throws Throwable
+    {
+        StubProxy handler = (StubProxy) Proxy.getInvocationHandler(proxy);
+
+        if (handler == null)
+            throw new Exception("couldn't get StubProxy handler");
+
+        if (m.getName().equals("hashCode"))
+            return hashCode(proxy, handler);
+        else if (m.getName().equals("equals") && (args.length == 1))
+            return equals(proxy, args[0]);
+        else if (m.getName().equals("toString"))
+            return toString(handler);
+        else
+            return m.invoke(handler, args);
+    }
+
+    private int hashCode(Object proxy, StubProxy handler) {
+        return handler.address.hashCode();
+    }
+
+    private String toString(StubProxy handler) {
+        return handler.toString();
+    }
+
+    private boolean equals(Object proxy, Object other) {
+        InvocationHandler handler = null;
+        if (other == null)
+            return false;
+
+        if (!Proxy.isProxyClass(other.getClass()) ||
+            !proxy.getClass().equals(other.getClass()))
+            return false;
+
+        handler = Proxy.getInvocationHandler(other);
+        if (!(handler instanceof StubProxy))
+            return false;
+
+        if (!address.equals(((StubProxy) handler).address))
+            return false;
+
+        return true;
     }
 }
