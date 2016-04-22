@@ -38,14 +38,9 @@ public class ClientProcessor<T> implements Runnable{
 
             if (readObj instanceof Message) {
                 msgObj = (Message)readObj;
-                Class[] argTypes = new Class[msgObj.getArgs().length];
-                int i = 0;
-                for (Object arg : msgObj.getArgs()) {
-                    argTypes[i++] = arg.getClass();
-                }
 
                 synchronized(serverObject) {
-                    m = serverObject.getClass().getMethod(msgObj.getMethodName(), argTypes);
+                    m = serverObject.getClass().getMethod(msgObj.getMethodName(), msgObj.getArgTypes());
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
                 }
                 oos.writeObject(Utility.INVOKE_SUCCESS);

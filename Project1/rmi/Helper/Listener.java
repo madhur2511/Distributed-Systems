@@ -27,7 +27,6 @@ public class Listener<T> implements Runnable{
             }
         }
         catch(Exception e){
-            e.printStackTrace();
         }
         finally{
             try{

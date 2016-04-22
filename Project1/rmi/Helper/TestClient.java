@@ -23,9 +23,9 @@ public class TestClient{
             InetSocketAddress addr = new InetSocketAddress(7000);
             proxyTest = Stub.create(TestInterface.class, addr);
 
-            result = proxyTest.testMessage("Hello");
-            System.out.println("SUCCESS: Result : " + result);
-            //System.out.println("SUCCESS: Result : " + proxyTest.addNum(1, 3));
+            // result = proxyTest.testMessage("Hello");
+            // System.out.println("SUCCESS: Result : " + result);
+            System.out.println("SUCCESS: Result : " + proxyTest.addNum(1, 3));
             //result = proxyTest.exceptionThrower("junk");
 
         } catch (Exception e) {

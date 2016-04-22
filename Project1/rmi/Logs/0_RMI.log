@@ -1,4 +1,3 @@
-Apr 21, 2016 9:18:34 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
-Apr 21, 2016 9:18:34 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=63455,localport=7000]
-Apr 21, 2016 9:18:34 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=63455,localport=7000]
-Apr 21, 2016 9:18:34 PM rmi.Helper.ClientProcessor run WARNING: Socket Connection Error: Connection reset
+Apr 21, 2016 9:50:33 PM rmi.Stub newInstance INFO: instantiated proxy for server running at: 0.0.0.0/0.0.0.0:7000
+Apr 21, 2016 9:50:33 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
+Apr 21, 2016 9:50:35 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final int com.sun.proxy.$Proxy0.addNum(int,int) throws rmi.RMIException RESULT: 4

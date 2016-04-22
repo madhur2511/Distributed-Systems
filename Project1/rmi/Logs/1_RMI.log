@@ -1,3 +1,4 @@
-Apr 21, 2016 8:48:48 PM rmi.Stub newInstance INFO: instantiated proxy for server running at: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 8:48:48 PM rmi.StubProxy invoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 8:48:48 PM rmi.StubProxy invoke INFO: Remote Invocation STATUS: true METHOD: public final java.lang.String com.sun.proxy.$Proxy0.testMessage(java.lang.String) throws rmi.RMIException RESULT: MK Hello, you are caller number 2
+Apr 21, 2016 9:50:33 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 9:50:33 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64500,localport=7000]
+Apr 21, 2016 9:50:33 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64500,localport=7000]
+Apr 21, 2016 9:50:33 PM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public int rmi.TestServer.addNum(int,int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@2eedeed7 RESULT: 4

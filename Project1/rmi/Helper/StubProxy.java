@@ -43,13 +43,6 @@ public class StubProxy implements InvocationHandler
         try {
             Class[] argTypes = m.getParameterTypes();
 
-            /* TODO:
-                Make primitive types work by using the idea printed below
-            */
-
-            for (Class arg : argTypes)
-                System.out.println(arg);
-
             method = proxy.getClass().getMethod(m.getName(), argTypes);
             if (method == null)
                 logger.log(Level.WARNING, "Could not find a matching method. METHOD: " + m + " ARGS: " + args);
@@ -65,6 +58,7 @@ public class StubProxy implements InvocationHandler
             Message msg = new Message();
             msg.setMethodName(method.getName());
             msg.setArgs(args);
+            msg.setArgTypes(argTypes);
             oos.writeObject(msg);
 
             int i = 0;
