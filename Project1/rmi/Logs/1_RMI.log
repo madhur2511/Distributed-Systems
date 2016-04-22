@@ -1,4 +1,20 @@
-Apr 21, 2016 9:50:33 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
-Apr 21, 2016 9:50:33 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64500,localport=7000]
-Apr 21, 2016 9:50:33 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64500,localport=7000]
-Apr 21, 2016 9:50:33 PM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public int rmi.TestServer.addNum(int,int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@2eedeed7 RESULT: 4
+Apr 21, 2016 10:55:27 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 10:55:27 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64971,localport=7000]
+Apr 21, 2016 10:55:27 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64971,localport=7000]
+Apr 21, 2016 10:55:27 PM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public java.lang.String rmi.TestServer.testMessage(java.lang.String) throws rmi.RMIException ARGS: [Ljava.lang.Object;@abf03d3 RESULT: MK Hello, you are caller number 1
+Apr 21, 2016 10:55:27 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 10:55:27 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64972,localport=7000]
+Apr 21, 2016 10:55:27 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64972,localport=7000]
+Apr 21, 2016 10:55:27 PM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public int rmi.TestServer.addNum(int,int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@e72eb23 RESULT: 4
+Apr 21, 2016 10:55:27 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 10:55:27 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64973,localport=7000]
+Apr 21, 2016 10:55:27 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64973,localport=7000]
+Apr 21, 2016 10:55:27 PM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public boolean rmi.TestServer.boolMirror(boolean) throws rmi.RMIException ARGS: [Ljava.lang.Object;@4633e86b RESULT: false
+Apr 21, 2016 10:55:38 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 10:55:38 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64980,localport=7000]
+Apr 21, 2016 10:55:38 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64980,localport=7000]
+Apr 21, 2016 10:55:38 PM rmi.Helper.ClientProcessor run WARNING: Socket Connection Error: Connection reset
+Apr 21, 2016 10:56:16 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 10:56:16 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=64999,localport=7000]
+Apr 21, 2016 10:56:16 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=64999,localport=7000]
+Apr 21, 2016 10:56:16 PM rmi.Helper.ClientProcessor run WARNING: Socket Connection Error: Connection reset

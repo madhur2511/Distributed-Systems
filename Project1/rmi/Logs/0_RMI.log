@@ -1,3 +1,7 @@
-Apr 21, 2016 9:50:33 PM rmi.Stub newInstance INFO: instantiated proxy for server running at: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 9:50:33 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 9:50:35 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final int com.sun.proxy.$Proxy0.addNum(int,int) throws rmi.RMIException RESULT: 4
+Apr 21, 2016 10:55:27 PM rmi.Stub newInstance INFO: instantiated proxy for server running at: 0.0.0.0/0.0.0.0:7000
+Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
+Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final java.lang.String com.sun.proxy.$Proxy0.testMessage(java.lang.String) throws rmi.RMIException RESULT: MK Hello, you are caller number 1
+Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
+Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final int com.sun.proxy.$Proxy0.addNum(int,int) throws rmi.RMIException RESULT: 4
+Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
+Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final boolean com.sun.proxy.$Proxy0.boolMirror(boolean) throws rmi.RMIException RESULT: false

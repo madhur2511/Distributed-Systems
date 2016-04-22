@@ -17,6 +17,10 @@ public class TestServer implements TestInterface{
         return a + b;
     }
 
+    public boolean boolMirror(boolean msg) throws RMIException{
+        return msg ? false : true;
+    }
+
     public String exceptionThrower(String msg) throws RMIException {
         throw new RMIException("Exception: " + msg);
     }

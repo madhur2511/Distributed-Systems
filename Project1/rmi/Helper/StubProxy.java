@@ -61,26 +61,32 @@ public class StubProxy implements InvocationHandler
             msg.setArgTypes(argTypes);
             oos.writeObject(msg);
 
-            int i = 0;
-            while(i < Utility.MAX_WAIT && is.available() == 0) {
-                try {
-                    Thread.sleep(Utility.SLEEPTIME);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                i += 1;
-            }
 
-            if (is.available() != 0) {
-                invoke_status = (boolean) ois.readObject();
-                result = ois.readObject();
-                logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
-                                       " METHOD: " + method + " RESULT: " + result);
-            } else {
-                logger.log(Level.WARNING, "Remote Invocation timed out. METHOD: " + method + " SERVER: " +
-                                          address.getAddress() + ":" + address.getPort());
-                throw new Exception("RMI timed out");
-            }
+            // TODO: Is there a testcase for this time-out ? If not, lets skip this, because
+            // is_available doesnt check remote socket state anyways.
+
+
+            // int i = 0;
+            // while(i < Utility.MAX_WAIT && is.available() == 0) {
+            //     try {
+            //         Thread.sleep(Utility.SLEEPTIME);
+            //     } catch (InterruptedException ex) {
+            //         Thread.currentThread().interrupt();
+            //     }
+            //     i += 1;
+            // }
+
+            //if (is.available() != 0) {
+            invoke_status = (boolean) ois.readObject();
+            result = ois.readObject();
+            logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
+                                   " METHOD: " + method + " RESULT: " + result);
+            // } else {
+            //     logger.log(Level.WARNING, "Remote Invocation timed out. METHOD: " + method + " SERVER: " +
+            //                               address.getAddress() + ":" + address.getPort());
+            //     throw new Exception("RMI timed out");
+            // }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -92,6 +98,7 @@ public class StubProxy implements InvocationHandler
             }
         }
         if (invoke_status != Utility.INVOKE_SUCCESS) {
+            System.out.println(result.toString());
             throw (Throwable)result;
         }
         return result;

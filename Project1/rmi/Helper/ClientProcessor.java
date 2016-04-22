@@ -49,27 +49,23 @@ public class ClientProcessor<T> implements Runnable{
                                         " RESULT: " + returnObj);
             }
         }
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //} catch (ClassNotFoundException e) {
-        //    e.printStackTrace();
-        //} catch (NoSuchMethodException e) {
-        //    e.printStackTrace();
-        //} catch (IllegalAccessException e) {
-        //    e.printStackTrace();
+
         catch (InvocationTargetException e) {
+            System.out.println("wkqjbfejbvwbvkebvjkerbvkewbvkjebvkjerbjkv");
             logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
                                       " ARGS: " + msgObj.getArgs() +
                                       " EXCEPTION: " + e.getMessage());
             try {
                 oos.writeObject(Utility.INVOKE_FAILURE);
-                oos.writeObject(e);
+                oos.writeObject(e.getTargetException());
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } catch (SocketException e) {
+        }
+        catch (SocketException e) {
             logger.log(Level.WARNING, "Socket Connection Error: " + e.getMessage());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             logger.log(Level.WARNING, "Non-Invocation Exception, METHOD: " + m +
                                       " ARGS: " + msgObj.getArgs() +
