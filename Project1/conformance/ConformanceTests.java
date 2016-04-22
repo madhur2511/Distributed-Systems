@@ -25,9 +25,9 @@ public class ConformanceTests
         @SuppressWarnings("unchecked")
         Class<? extends Test>[]     tests =
             new Class[] {
-                         //conformance.rmi.SkeletonTest.class,
-                         //conformance.rmi.StubTest.class,
-                         //conformance.rmi.ConnectionTest.class
+                         conformance.rmi.SkeletonTest.class,
+                         conformance.rmi.StubTest.class,
+                         conformance.rmi.ConnectionTest.class,
                          conformance.rmi.ThreadTest.class
                         };
         Series                      series = new Series(tests);

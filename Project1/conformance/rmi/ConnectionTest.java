@@ -21,7 +21,7 @@ public class ConnectionTest extends Test
         "checking connection between stub and skeleton";
     /** Prerequisites. */
     public static final Class[] prerequisites =
-        new Class[] {};//{SkeletonTest.class, StubTest.class};
+        new Class[] {SkeletonTest.class, StubTest.class};
 
     /** Address at which the test skeleton will run. */
     private InetSocketAddress   address;
