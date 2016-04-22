@@ -6,29 +6,25 @@ import java.util.logging.*;
 
 public class Listener<T> implements Runnable{
 
-    private final int BACKLOG = 50;
     protected ServerSocket listener = null;
     protected InetSocketAddress address = null;
     protected Skeleton<T> skeletonReference = null;
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    public Listener(Skeleton<T> skeletonReference, InetSocketAddress address){
-        this.address = address;
+    public Listener(Skeleton<T> skeletonReference, ServerSocket listener){
+        this.listener = listener;
         this.skeletonReference = skeletonReference;
-        logger.log(Level.INFO, "Binding skeleton-listener to " + address.getAddress() + ":" + address.getPort());
     }
 
     public void run() {
         try{
-            listener = new ServerSocket(address.getPort(), BACKLOG, address.getAddress());
-            while(!Thread.currentThread().isInterrupted()){
+            while(true){
                 Socket clientSocket = listener.accept();
                 System.out.println("Connected to client: " + clientSocket.getInetAddress());
 
                 logger.log(Level.INFO, "Connected to client: " + clientSocket.getInetAddress());
                 skeletonReference.newClient(clientSocket);
             }
-            listener.close();
         }
         catch(Exception e){
             e.printStackTrace();

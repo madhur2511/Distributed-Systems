@@ -1,4 +1,7 @@
 package rmi;
+import rmi.*;
+import java.io.*;
+import java.net.*;
 import java.net.*;
 import rmi.Helper.*;
 import java.lang.reflect.*;
@@ -28,14 +31,16 @@ import java.util.logging.*;
 */
 public class Skeleton<T>
 {
+    private final int BACKLOG = 50;
     protected Thread listenerThread = null;
+    ServerSocket listener = null;
     protected InetSocketAddress skeletonAddress = null;
     protected T serverObject = null;
     protected Class<T> classObject = null;
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    public InetSocketAddress getAddress() {
-        return skeletonAddress;
+    public InetSocketAddress getAddress(){
+        return this.skeletonAddress;
     }
 
     /** Creates a <code>Skeleton</code> with no initial server address. The
@@ -62,7 +67,7 @@ public class Skeleton<T>
         if (c == null || server == null)
             throw new NullPointerException("Either class interface or server instance is missing");
 
-        if (!Utility.isValidRemoteInterface(c))
+        if (!checkRemoteInterfaceImplementation(c))
             throw new Error("The type variable given doesnt represent a remote interface");
 
         this.serverObject = server;
@@ -93,7 +98,7 @@ public class Skeleton<T>
         if (c == null || server == null)
             throw new NullPointerException("Either class interface or server instance missing");
 
-        if (!Utility.isValidRemoteInterface(c))
+        if (!checkRemoteInterfaceImplementation(c))
             throw new Error();
 
         this.serverObject = server;
@@ -174,7 +179,8 @@ public class Skeleton<T>
             skeletonAddress = new InetSocketAddress(11111);
         }
         try{
-            listenerThread = new Thread(new Listener<T>(this, skeletonAddress));
+            listener = new ServerSocket(skeletonAddress.getPort(), BACKLOG, skeletonAddress.getAddress());
+            listenerThread = new Thread(new Listener<T>(this, listener));
             listenerThread.start();
             try{
                 Thread.sleep(10);
@@ -202,11 +208,23 @@ public class Skeleton<T>
      */
     public synchronized void stop()
     {
-        if (listenerThread != null){
-            listenerThread.interrupt();
-            if (listenerThread.getState() == Thread.State.TERMINATED){
-               this.stopped(null);
+        if (listenerThread != null && listener != null){
+            try{
+                listener.close();
+            }catch(IOException e){
+                e.printStackTrace();
             }
+           this.stopped(null);
         }
+    }
+
+    private synchronized boolean checkRemoteInterfaceImplementation(Class<T> c){
+        Method[] methods = c.getMethods();
+        int count = 0;
+        for (Method method : methods)
+            for (Class exceptionClass : method.getExceptionTypes())
+                if (exceptionClass == RMIException.class)
+                    count += 1;
+        return count == methods.length ? true : false;
     }
 }

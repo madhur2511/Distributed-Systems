@@ -1,5 +1,4 @@
-Apr 19, 2016 1:40:20 AM rmi.Helper.Listener <init> INFO: Binding skeleton-listener to 0.0.0.0/0.0.0.0:7000
-Apr 19, 2016 1:40:20 AM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
-Apr 19, 2016 1:40:20 AM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=49799,localport=7000]
-Apr 19, 2016 1:40:20 AM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=49799,localport=7000]
-Apr 19, 2016 1:40:20 AM rmi.Helper.ClientProcessor run WARNING: Socket Connection Error: Connection reset
+Apr 21, 2016 9:18:34 PM rmi.Helper.Listener run INFO: Connected to client: /128.54.251.215
+Apr 21, 2016 9:18:34 PM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/128.54.251.215,port=63455,localport=7000]
+Apr 21, 2016 9:18:34 PM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/128.54.251.215,port=63455,localport=7000]
+Apr 21, 2016 9:18:34 PM rmi.Helper.ClientProcessor run WARNING: Socket Connection Error: Connection reset

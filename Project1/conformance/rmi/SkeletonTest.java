@@ -51,7 +51,7 @@ public class SkeletonTest extends Test
         ensureClassRejected();
         ensureNonRemoteInterfaceRejected();
         ensureNullPointerExceptions();
-        //ensureSkeletonRuns();
+        ensureSkeletonRuns();
     }
 
     /** Performs tests with a running skeleton.
@@ -92,7 +92,7 @@ public class SkeletonTest extends Test
         }
 
         if(probe())
-           throw new TestFailed("skeleton accepts connections after stop");
+            throw new TestFailed("skeleton accepts connections after stop");
     }
 
     /** Wakes <code>ensureSkeletonRuns</code>. */
@@ -109,7 +109,7 @@ public class SkeletonTest extends Test
      */
     private boolean probe()
     {
-        Socket socket = new Socket();
+        Socket      socket = new Socket();
 
         try
         {
