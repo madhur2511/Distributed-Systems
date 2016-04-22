@@ -77,10 +77,12 @@ public class StubProxy implements InvocationHandler
             // }
 
             //if (is.available() != 0) {
+
             invoke_status = (boolean) ois.readObject();
             result = ois.readObject();
             logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
                                    " METHOD: " + method + " RESULT: " + result);
+
             // } else {
             //     logger.log(Level.WARNING, "Remote Invocation timed out. METHOD: " + method + " SERVER: " +
             //                               address.getAddress() + ":" + address.getPort());
@@ -88,10 +90,23 @@ public class StubProxy implements InvocationHandler
             // }
 
         } catch (Exception e) {
-            e.printStackTrace();
+
+
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+            //TODO: NEED TO VERIFY THIS ONCE
+
+
+            throw new RMIException(e);
         } finally {
             try {
-                socket.close();
+                if(!socket.isClosed())
+                    socket.close();
             }
             catch (IOException e) {
                 System.out.println(e);
