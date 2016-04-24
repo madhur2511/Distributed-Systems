@@ -131,21 +131,20 @@ public class StubProxy implements InvocationHandler
         else if (m.getName().equals("equals") && (args.length == 1))
             return equals(proxy, args[0]);
         else if (m.getName().equals("toString"))
-            return toString(handler);
+            return toString(proxy, handler);
         else
             return m.invoke(handler, args);
     }
 
     private int hashCode(Object proxy, StubProxy handler) {
-        return handler.address.hashCode();
+        return proxy.getClass().hashCode() + handler.address.hashCode();
     }
 
-    private String toString(StubProxy handler) {
-        return handler.toString();
+    private String toString(Object proxy, StubProxy handler) {
+        return proxy.getClass().getName() + " " + handler.address.toString();
     }
 
     private boolean equals(Object proxy, Object other) {
-        InvocationHandler handler = null;
         if (other == null)
             return false;
 
@@ -153,7 +152,7 @@ public class StubProxy implements InvocationHandler
             !proxy.getClass().equals(other.getClass()))
             return false;
 
-        handler = Proxy.getInvocationHandler(other);
+        InvocationHandler handler = Proxy.getInvocationHandler(other);
         if (!(handler instanceof StubProxy))
             return false;
 
