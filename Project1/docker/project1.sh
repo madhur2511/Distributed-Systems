@@ -29,7 +29,13 @@ sleep 5
 
 docker run -itd --net=mynet --name rmiclient --volumes-from rminode rmi_client /bin/bash  -c "source /TestClient.sh"
 
-sleep 15
+sleep 5
 
-docker logs rmiclient
+echo "*******************
+* RMI server logs *
+*******************"
 docker logs rmiserver
+echo "*******************
+* RMI client logs *
+*******************"
+docker logs rmiclient

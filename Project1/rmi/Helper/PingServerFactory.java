@@ -14,20 +14,30 @@ public class PingServerFactory implements PingServerFactoryInterface
         port = 9999;
     }
 
-    public PingPongServer makePingServer() throws RMIException {
+    public Object makePingServer() throws RMIException {
         // instantiate server and return skeleton obj
-        InetSocketAddress addr = new InetSocketAddress(port);
+        InetSocketAddress addr = new InetSocketAddress("rmiserver", port);
         port += 1;
         PingPongServer pingserver = new PingPongServer(addr);
 
         try {
-            Skeleton<PingPongInterface> skeleton = new Skeleton<PingPongInterface>(PingPongInterface.class, pingserver, addr);
+            Skeleton<PingPongInterface> skeleton1 = new Skeleton<PingPongInterface>(PingPongInterface.class, pingserver, addr);
 
-            skeleton.start();
+            skeleton1.start();
             logger.log(Level.INFO, "started ping server at: " + addr + ":" + addr.getPort());
-            return pingserver;
+
+            PingPongInterface pingStub = Stub.create(PingPongInterface.class, skeleton1);
+            logger.log(Level.INFO, "created stub for ping server.");
+
+            try{
+                Thread.sleep(1000);
+            }catch(InterruptedException e){
+
+            }
+
+            return pingStub;
         } catch(RMIException e) {
-            logger.log(Level.WARNING, "unable to start skeleton, " + e);
+            logger.log(Level.WARNING, "unable to create ping server, " + e);
             e.printStackTrace();
         } catch(Exception e) {
             e.printStackTrace();
@@ -37,24 +47,20 @@ public class PingServerFactory implements PingServerFactoryInterface
 
     public static void main(String args[])
     {
-        PingPongServer pingserver = null;
         try
         {
-            PingServerFactory obj = new PingServerFactory();
-            logger.log(Level.INFO, "PingServerFactory started");
+            PingServerFactory serverfactory = new PingServerFactory();
+            InetSocketAddress addr = new InetSocketAddress(7000);
 
-            //TODO: makePingServer() call should be made by client using rmi.registry
-            pingserver = obj.makePingServer();
+            Skeleton<PingServerFactoryInterface> skeleton =
+                    new Skeleton<PingServerFactoryInterface>(PingServerFactoryInterface.class, serverfactory, addr);
 
-            if (pingserver != null)
-                logger.log(Level.INFO, "started ping server");
-            else
-                logger.log(Level.WARNING, "failed to start ping server");
-
+            skeleton.start();
+            logger.log(Level.INFO, "PingServerFactory skeleton started");
         }
         catch (Exception e)
         {
-            logger.log(Level.WARNING, "PingServerFactory err: " + e.getMessage());
+            logger.log(Level.WARNING, "failed to start PingServerFactory skeleton, err: " + e.getMessage());
             e.printStackTrace();
         }
         return;

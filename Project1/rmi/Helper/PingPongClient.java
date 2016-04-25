@@ -12,20 +12,31 @@ public class PingPongClient{
         int id = 0;
         int pass = 0;
         String result = "";
+        PingServerFactoryInterface factory = null;
         PingPongInterface proxy = null;
+        InetSocketAddress pingaddr = null;
 
         try {
 
-            InetSocketAddress addr = new InetSocketAddress("rmiserver", 9999);
-            proxy = Stub.create(PingPongInterface.class, addr);
+            InetSocketAddress addr = new InetSocketAddress("rmiserver", 7000);
 
-            logger.log(Level.INFO, "Stub created");
+            factory = Stub.create(PingServerFactoryInterface.class, addr);
+            logger.log(Level.INFO, "factory Stub created");
 
-            for (id = 0; id < 4; id++) {
-                result = proxy.ping(id);
-                if (result.equals("Pong, ID: " + id))
-                    pass += 1;
-            }
+            proxy = (PingPongInterface) factory.makePingServer();
+
+            if (proxy == null)
+                throw new Exception("Something bad happened.");
+
+            logger.log(Level.INFO, "ping server Stub created");
+
+            result = proxy.ping(0);
+
+            // for (id = 0; id < 4; id++) {
+            //     result = proxy.ping(id);
+            //     if (result.equals("Pong, ID: " + id))
+            //         pass += 1;
+            // }
 
         } catch (Exception e) {
             logger.log(Level.INFO, "Exception: " + e);

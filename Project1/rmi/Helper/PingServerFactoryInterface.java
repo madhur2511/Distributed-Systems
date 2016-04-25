@@ -1,8 +1,7 @@
 package rmi;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java.net.*;
 
-public interface PingServerFactoryInterface extends Remote {
-    public PingPongServer makePingServer() throws RemoteException, RMIException;
+public interface PingServerFactoryInterface {
+    public Object makePingServer() throws RMIException;
 }

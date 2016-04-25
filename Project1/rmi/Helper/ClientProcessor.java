@@ -33,10 +33,14 @@ public class ClientProcessor<T> implements Runnable{
             oos.flush();
 
             ois = new ObjectInputStream(clientSocket.getInputStream());
-            if(!this.clientSocket.isClosed())
-                readObj = ois.readObject();
+            if(!this.clientSocket.isClosed()){
+                try{
+                    readObj = ois.readObject();
+                }catch(EOFException e){
 
-            if (readObj instanceof Message) {
+                }
+            }
+            if (readObj != null && readObj instanceof Message) {
                 msgObj = (Message)readObj;
 
                 synchronized(serverObject) {
@@ -45,13 +49,13 @@ public class ClientProcessor<T> implements Runnable{
                 }
                 oos.writeObject(Utility.INVOKE_SUCCESS);
                 oos.writeObject(returnObj);
+                System.out.println("jejbjebfjbejbcjecjnejcnejncjecjencjenjc");
                 logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
                                         " RESULT: " + returnObj);
             }
         }
 
         catch (InvocationTargetException e) {
-            System.out.println("wkqjbfejbvwbvkebvjkerbvkewbvkjebvkjerbjkv");
             logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
                                       " ARGS: " + msgObj.getArgs() +
                                       " EXCEPTION: " + e.getMessage());

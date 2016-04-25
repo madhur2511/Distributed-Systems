@@ -8,10 +8,10 @@ import rmi.*;
 import java.lang.reflect.*;
 import java.util.logging.*;
 
-public class StubProxy implements InvocationHandler
+public class StubProxy implements InvocationHandler, Serializable
 {
     private final InetSocketAddress address;
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final transient Logger logger = Logger.getLogger(this.getClass().getName());
 
     public StubProxy(InetSocketAddress address) {
         this.address = address;
@@ -44,8 +44,11 @@ public class StubProxy implements InvocationHandler
             Class[] argTypes = m.getParameterTypes();
 
             method = proxy.getClass().getMethod(m.getName(), argTypes);
-            if (method == null)
+            if (method == null) {
                 logger.log(Level.WARNING, "Could not find a matching method. METHOD: " + m + " ARGS: " + args);
+                throw new Exception("remote interface: " + proxy.getClass().getName() + " does not implement the method: "
+                                    + m.getName() + "(" + argTypes + ")");
+            }
 
             socket = new Socket(address.getAddress(), address.getPort());
             oos = new ObjectOutputStream(socket.getOutputStream());
@@ -59,6 +62,7 @@ public class StubProxy implements InvocationHandler
             msg.setMethodName(method.getName());
             msg.setArgs(args);
             msg.setArgTypes(argTypes);
+
             oos.writeObject(msg);
 
 
@@ -101,7 +105,7 @@ public class StubProxy implements InvocationHandler
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
 
-
+            logger.log(Level.WARNING, "remoteInvoke Failed, err: " + e);
             throw new RMIException(e);
         } finally {
             try {
