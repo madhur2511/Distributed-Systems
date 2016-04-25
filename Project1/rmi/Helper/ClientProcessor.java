@@ -34,12 +34,9 @@ public class ClientProcessor<T> implements Runnable{
 
             ois = new ObjectInputStream(clientSocket.getInputStream());
             if(!this.clientSocket.isClosed()){
-                try{
-                    readObj = ois.readObject();
-                }catch(EOFException e){
-
-                }
+                readObj = ois.readObject();
             }
+
             if (readObj != null && readObj instanceof Message) {
                 msgObj = (Message)readObj;
 
@@ -49,12 +46,10 @@ public class ClientProcessor<T> implements Runnable{
                 }
                 oos.writeObject(Utility.INVOKE_SUCCESS);
                 oos.writeObject(returnObj);
-                System.out.println("jejbjebfjbejbcjecjnejcnejncjecjencjenjc");
                 logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
                                         " RESULT: " + returnObj);
             }
         }
-
         catch (InvocationTargetException e) {
             logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
                                       " ARGS: " + msgObj.getArgs() +

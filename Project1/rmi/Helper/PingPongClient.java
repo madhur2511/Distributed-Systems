@@ -14,7 +14,6 @@ public class PingPongClient{
         String result = "";
         PingServerFactoryInterface factory = null;
         PingPongInterface proxy = null;
-        InetSocketAddress pingaddr = null;
 
         try {
 
@@ -30,13 +29,12 @@ public class PingPongClient{
 
             logger.log(Level.INFO, "ping server Stub created");
 
-            result = proxy.ping(0);
-
-            // for (id = 0; id < 4; id++) {
-            //     result = proxy.ping(id);
-            //     if (result.equals("Pong, ID: " + id))
-            //         pass += 1;
-            // }
+            for (id = 0; id < 4; id++) {
+                result = proxy.ping(id);
+                System.out.println("RESULT: " + result);
+                if (result.equals("Pong, ID: " + id))
+                    pass += 1;
+            }
 
         } catch (Exception e) {
             logger.log(Level.INFO, "Exception: " + e);
