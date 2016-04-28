@@ -56,8 +56,8 @@ public class StubProxy implements InvocationHandler, Serializable
             is = socket.getInputStream();
             ois = new ObjectInputStream(is);
 
-//            logger.log(Level.INFO, "Connected to SERVER: "
-//                                    + address.getAddress() + ":" + address.getPort());
+            //logger.log(Level.INFO, "Connected to SERVER: "
+            //                        + address.getAddress() + ":" + address.getPort());
 
             Message msg = new Message();
             msg.setMethodName(method.getName());
@@ -93,12 +93,9 @@ public class StubProxy implements InvocationHandler, Serializable
 
             System.out.println("Received result at client stubproxy: " + result);
 
-        //    logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
-        //                           " METHOD: " + method + " RESULT: " + result);
 
-
-
-
+            //logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
+            //                       " METHOD: " + method + " RESULT: " + result);
 
             // } else {
             //     logger.log(Level.WARNING, "Remote Invocation timed out. METHOD: " + method + " SERVER: " +
@@ -108,7 +105,7 @@ public class StubProxy implements InvocationHandler, Serializable
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
@@ -118,7 +115,8 @@ public class StubProxy implements InvocationHandler, Serializable
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
 
-            // logger.log(Level.WARNING, "remoteInvoke Failed, err: " + e);
+            //logger.log(Level.WARNING, "remoteInvoke Failed, err: " + e);
+
             throw new RMIException(e);
         } finally {
             try {

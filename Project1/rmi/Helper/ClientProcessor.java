@@ -36,6 +36,7 @@ public class ClientProcessor<T> implements Runnable{
             if(!this.clientSocket.isClosed()){
                 readObj = ois.readObject();
             }
+
             if (readObj != null && readObj instanceof Message) {
                 msgObj = (Message)readObj;
 
@@ -52,7 +53,6 @@ public class ClientProcessor<T> implements Runnable{
                 System.out.println("Skeleton responding with " + returnObj);
             }
         }
-
         catch (InvocationTargetException e) {
             // logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
                                     //   " ARGS: " + msgObj.getArgs() +

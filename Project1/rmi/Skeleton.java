@@ -180,7 +180,6 @@ public class Skeleton<T>
         }
         try{
             listener = new ServerSocket(skeletonAddress.getPort(), BACKLOG, skeletonAddress.getAddress());
-            System.out.println("Listener created for socket: " + skeletonAddress.getPort());
             listenerThread = new Thread(new Listener<T>(this, listener));
             listenerThread.start();
             try{

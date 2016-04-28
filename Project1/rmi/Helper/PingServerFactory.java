@@ -62,6 +62,5 @@ public class PingServerFactory implements PingServerFactoryInterface
             // logger.log(Level.WARNING, "failed to start PingServerFactory skeleton, err: " + e.getMessage());
             e.printStackTrace();
         }
-        return;
     }
 }

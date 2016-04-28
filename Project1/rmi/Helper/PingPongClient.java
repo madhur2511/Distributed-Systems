@@ -34,6 +34,7 @@ public class PingPongClient{
 
             for (id = 0; id < 4; id++) {
                 result = clientProxy.ping(id);
+                System.out.println("RESULT: " + result);
                 if (result.equals("Pong, ID: " + id))
                     pass += 1;
             }
