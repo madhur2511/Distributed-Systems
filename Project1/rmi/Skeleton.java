@@ -37,7 +37,7 @@ public class Skeleton<T>
     protected InetSocketAddress skeletonAddress = null;
     protected T serverObject = null;
     protected Class<T> classObject = null;
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    // private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public InetSocketAddress getAddress(){
         return this.skeletonAddress;
@@ -176,7 +176,7 @@ public class Skeleton<T>
     public synchronized void start() throws RMIException
     {
         if(skeletonAddress == null){
-            skeletonAddress = new InetSocketAddress(11111);
+            skeletonAddress = new InetSocketAddress(50001);
         }
         try{
             listener = new ServerSocket(skeletonAddress.getPort(), BACKLOG, skeletonAddress.getAddress());
@@ -194,7 +194,7 @@ public class Skeleton<T>
     }
 
     public synchronized void newClient(Socket clientSocket){
-        logger.log(Level.INFO, "Spawning a thread for the new client: " + clientSocket);
+        // logger.log(Level.INFO, "Spawning a thread for the new client: " + clientSocket);
         new Thread(new ClientProcessor<T>(clientSocket, serverObject, classObject)).start();
     }
 

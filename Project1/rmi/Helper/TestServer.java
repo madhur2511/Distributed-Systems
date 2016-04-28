@@ -28,7 +28,7 @@ public class TestServer implements TestInterface{
     public static void main(String[] args) throws RMIException{
         TestServer server = new TestServer();
         //try{
-        addr = new InetSocketAddress(7000);
+        addr = new InetSocketAddress(50001);
         Skeleton<TestInterface> skeleton = new Skeleton<TestInterface>(TestInterface.class, server, addr);
 
         try{

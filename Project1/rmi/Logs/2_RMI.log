@@ -1,0 +1,4 @@
+Apr 25, 2016 12:00:43 AM rmi.Stub newInstance INFO: instantiated proxy for server running at: localhost/127.0.0.1:50002
+Apr 25, 2016 12:00:44 AM rmi.PingPongClient main INFO: factory Stub created
+Apr 25, 2016 12:00:44 AM rmi.PingPongClient main INFO: factory Stub created
+Apr 25, 2016 12:00:44 AM rmi.PingPongClient main INFO: 4 Tests Completed, 0 Tests Failed.

@@ -19,7 +19,7 @@ import java.util.logging.*;
  */
 public abstract class Stub
 {
-    private static Logger logger = Logger.getLogger(Stub.class.getName());
+    // private static Logger logger = Logger.getLogger(Stub.class.getName());
 
     private static Object newInstance(Class c, InetSocketAddress address)
     {
@@ -27,7 +27,7 @@ public abstract class Stub
                                             c.getClassLoader(),
                                             new Class[] {c},
                                             new StubProxy(address));
-        logger.log(Level.INFO, "instantiated proxy for server running at: " + address.getAddress() + ":" + address.getPort());
+        // logger.log(Level.INFO, "instantiated proxy for server running at: " + address.getAddress() + ":" + address.getPort());
         return obj;
     }
     /** Creates a stub, given a skeleton with an assigned adress.

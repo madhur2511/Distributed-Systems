@@ -7,7 +7,7 @@ import java.util.logging.*;
 
 public class ClientProcessor<T> implements Runnable{
     private final Socket clientSocket;
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    // private Logger logger = Logger.getLogger(this.getClass().getName());
 
     protected T serverObject = null;
     protected Class<T> classObject = null;
@@ -26,7 +26,7 @@ public class ClientProcessor<T> implements Runnable{
         Message msgObj = null;
         Method m = null;
 
-        logger.log(Level.INFO, "Got a client: " + clientSocket);
+        // logger.log(Level.INFO, "Got a client: " + clientSocket);
 
         try {
             oos = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -34,11 +34,7 @@ public class ClientProcessor<T> implements Runnable{
 
             ois = new ObjectInputStream(clientSocket.getInputStream());
             if(!this.clientSocket.isClosed()){
-                try{
-                    readObj = ois.readObject();
-                }catch(EOFException e){
-
-                }
+                readObj = ois.readObject();
             }
             if (readObj != null && readObj instanceof Message) {
                 msgObj = (Message)readObj;
@@ -49,16 +45,18 @@ public class ClientProcessor<T> implements Runnable{
                 }
                 oos.writeObject(Utility.INVOKE_SUCCESS);
                 oos.writeObject(returnObj);
-                System.out.println("jejbjebfjbejbcjecjnejcnejncjecjencjenjc");
-                logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
-                                        " RESULT: " + returnObj);
+
+                // logger.log(Level.INFO, "Invoked METHOD: " + m + " ARGS: " + msgObj.getArgs() +
+                                        // " RESULT: " + returnObj);
+
+                System.out.println("Skeleton responding with " + returnObj);
             }
         }
 
         catch (InvocationTargetException e) {
-            logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
-                                      " ARGS: " + msgObj.getArgs() +
-                                      " EXCEPTION: " + e.getMessage());
+            // logger.log(Level.WARNING, "Invocation Exception, METHOD: " + m +
+                                    //   " ARGS: " + msgObj.getArgs() +
+                                    //   " EXCEPTION: " + e.getMessage());
             try {
                 oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(e.getTargetException());
@@ -67,13 +65,13 @@ public class ClientProcessor<T> implements Runnable{
             }
         }
         catch (SocketException e) {
-            logger.log(Level.WARNING, "Socket Connection Error: " + e.getMessage());
+            // logger.log(Level.WARNING, "Socket Connection Error: " + e.getMessage());
         }
         catch (Exception e) {
             e.printStackTrace();
-            logger.log(Level.WARNING, "Non-Invocation Exception, METHOD: " + m +
-                                      " ARGS: " + msgObj.getArgs() +
-                                      " EXCEPTION: " + e.getMessage());
+            // logger.log(Level.WARNING, "Non-Invocation Exception, METHOD: " + m +
+                                    //   " ARGS: " + msgObj.getArgs() +
+                                    //   " EXCEPTION: " + e.getMessage());
             try {
                 oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(e);

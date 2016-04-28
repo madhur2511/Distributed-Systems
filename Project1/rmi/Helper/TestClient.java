@@ -20,7 +20,7 @@ public class TestClient{
         TestInterface proxyTest;
         try {
             String result;
-            InetSocketAddress addr = new InetSocketAddress(7000);
+            InetSocketAddress addr = new InetSocketAddress(50001);
             proxyTest = Stub.create(TestInterface.class, addr);
 
             result = proxyTest.testMessage("Hello");

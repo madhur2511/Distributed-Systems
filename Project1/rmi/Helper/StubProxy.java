@@ -10,8 +10,8 @@ import java.util.logging.*;
 
 public class StubProxy implements InvocationHandler, Serializable
 {
-    private final InetSocketAddress address;
-    private final transient Logger logger = Logger.getLogger(this.getClass().getName());
+    private InetSocketAddress address = null;
+    // private final transient Logger logger = Logger.getLogger(this.getClass().getName());
 
     public StubProxy(InetSocketAddress address) {
         this.address = address;
@@ -45,7 +45,7 @@ public class StubProxy implements InvocationHandler, Serializable
 
             method = proxy.getClass().getMethod(m.getName(), argTypes);
             if (method == null) {
-                logger.log(Level.WARNING, "Could not find a matching method. METHOD: " + m + " ARGS: " + args);
+                // logger.log(Level.WARNING, "Could not find a matching method. METHOD: " + m + " ARGS: " + args);
                 throw new Exception("remote interface: " + proxy.getClass().getName() + " does not implement the method: "
                                     + m.getName() + "(" + argTypes + ")");
             }
@@ -55,8 +55,9 @@ public class StubProxy implements InvocationHandler, Serializable
             oos.flush();
             is = socket.getInputStream();
             ois = new ObjectInputStream(is);
-            logger.log(Level.INFO, "Connected to SERVER: "
-                                    + address.getAddress() + ":" + address.getPort());
+
+//            logger.log(Level.INFO, "Connected to SERVER: "
+//                                    + address.getAddress() + ":" + address.getPort());
 
             Message msg = new Message();
             msg.setMethodName(method.getName());
@@ -64,6 +65,8 @@ public class StubProxy implements InvocationHandler, Serializable
             msg.setArgTypes(argTypes);
 
             oos.writeObject(msg);
+
+            System.out.println("StubProxy asking for method" + method.getName());
 
 
             // TODO: Is there a testcase for this time-out ? If not, lets skip this, because
@@ -82,10 +85,20 @@ public class StubProxy implements InvocationHandler, Serializable
 
             //if (is.available() != 0) {
 
+
+
+
             invoke_status = (boolean) ois.readObject();
             result = ois.readObject();
-            logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
-                                   " METHOD: " + method + " RESULT: " + result);
+
+            System.out.println("Received result at client stubproxy: " + result);
+
+        //    logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
+        //                           " METHOD: " + method + " RESULT: " + result);
+
+
+
+
 
             // } else {
             //     logger.log(Level.WARNING, "Remote Invocation timed out. METHOD: " + method + " SERVER: " +
@@ -95,7 +108,7 @@ public class StubProxy implements InvocationHandler, Serializable
 
         } catch (Exception e) {
 
-
+            e.printStackTrace();
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
@@ -105,7 +118,7 @@ public class StubProxy implements InvocationHandler, Serializable
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
 
-            logger.log(Level.WARNING, "remoteInvoke Failed, err: " + e);
+            // logger.log(Level.WARNING, "remoteInvoke Failed, err: " + e);
             throw new RMIException(e);
         } finally {
             try {

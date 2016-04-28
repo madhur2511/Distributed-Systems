@@ -9,7 +9,7 @@ public class Listener<T> implements Runnable{
     protected ServerSocket listener = null;
     protected InetSocketAddress address = null;
     protected Skeleton<T> skeletonReference = null;
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    //private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public Listener(Skeleton<T> skeletonReference, ServerSocket listener){
         this.listener = listener;
@@ -22,7 +22,7 @@ public class Listener<T> implements Runnable{
                 Socket clientSocket = listener.accept();
                 System.out.println("Connected to client: " + clientSocket.getInetAddress());
 
-                logger.log(Level.INFO, "Connected to client: " + clientSocket.getInetAddress());
+    //            logger.log(Level.INFO, "Connected to client: " + clientSocket.getInetAddress());
                 skeletonReference.newClient(clientSocket);
             }
         }

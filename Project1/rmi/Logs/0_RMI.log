@@ -1,7 +1,24 @@
-Apr 21, 2016 10:55:27 PM rmi.Stub newInstance INFO: instantiated proxy for server running at: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final java.lang.String com.sun.proxy.$Proxy0.testMessage(java.lang.String) throws rmi.RMIException RESULT: MK Hello, you are caller number 1
-Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final int com.sun.proxy.$Proxy0.addNum(int,int) throws rmi.RMIException RESULT: 4
-Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Connected to SERVER: 0.0.0.0/0.0.0.0:7000
-Apr 21, 2016 10:55:27 PM rmi.Helper.StubProxy remoteInvoke INFO: Remote Invocation STATUS: true METHOD: public final boolean com.sun.proxy.$Proxy0.boolMirror(boolean) throws rmi.RMIException RESULT: false
+Apr 25, 2016 12:00:41 AM rmi.PingServerFactory main INFO: PingServerFactory skeleton started
+Apr 25, 2016 12:00:44 AM rmi.Helper.Listener run INFO: Connected to client: /127.0.0.1
+Apr 25, 2016 12:00:44 AM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/127.0.0.1,port=65477,localport=50002]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/127.0.0.1,port=65477,localport=50002]
+Apr 25, 2016 12:00:44 AM rmi.PingServerFactory makePingServer INFO: started ping server at: localhost/127.0.0.1:50001:50001
+Apr 25, 2016 12:00:44 AM rmi.Stub newInstance INFO: instantiated proxy for server running at: localhost/127.0.0.1:50001
+Apr 25, 2016 12:00:44 AM rmi.PingServerFactory makePingServer INFO: created stub for ping server.
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public java.lang.Object rmi.PingServerFactory.makePingServer() throws rmi.RMIException ARGS: null RESULT: com.sun.proxy.$Proxy0 localhost/127.0.0.1:50001
+Apr 25, 2016 12:00:44 AM rmi.Helper.Listener run INFO: Connected to client: /127.0.0.1
+Apr 25, 2016 12:00:44 AM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/127.0.0.1,port=65478,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/127.0.0.1,port=65478,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public java.lang.String rmi.PingPongServer.ping(int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@6a005f2d RESULT: Pong, ID: 0
+Apr 25, 2016 12:00:44 AM rmi.Helper.Listener run INFO: Connected to client: /127.0.0.1
+Apr 25, 2016 12:00:44 AM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/127.0.0.1,port=65479,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/127.0.0.1,port=65479,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public java.lang.String rmi.PingPongServer.ping(int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@7a3a695f RESULT: Pong, ID: 1
+Apr 25, 2016 12:00:44 AM rmi.Helper.Listener run INFO: Connected to client: /127.0.0.1
+Apr 25, 2016 12:00:44 AM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/127.0.0.1,port=65480,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/127.0.0.1,port=65480,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public java.lang.String rmi.PingPongServer.ping(int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@19740ce0 RESULT: Pong, ID: 2
+Apr 25, 2016 12:00:44 AM rmi.Helper.Listener run INFO: Connected to client: /127.0.0.1
+Apr 25, 2016 12:00:44 AM rmi.Skeleton newClient INFO: Spawning a thread for the new client: Socket[addr=/127.0.0.1,port=65481,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Got a client: Socket[addr=/127.0.0.1,port=65481,localport=50001]
+Apr 25, 2016 12:00:44 AM rmi.Helper.ClientProcessor run INFO: Invoked METHOD: public java.lang.String rmi.PingPongServer.ping(int) throws rmi.RMIException ARGS: [Ljava.lang.Object;@26c15119 RESULT: Pong, ID: 3
