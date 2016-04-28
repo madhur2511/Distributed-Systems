@@ -27,6 +27,7 @@ public class TestClient{
             System.out.println("SUCCESS: Result : " + result);
             System.out.println("SUCCESS: Result : " + proxyTest.addNum(1, 3));
             System.out.println("SUCCESS: Result : " + proxyTest.boolMirror(true));
+            System.out.println(proxyTest.toString());
             //result = proxyTest.exceptionThrower("junk");
 
         } catch (Exception e) {

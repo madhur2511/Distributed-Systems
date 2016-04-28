@@ -68,26 +68,6 @@ public class StubProxy implements InvocationHandler, Serializable
 
             System.out.println("StubProxy asking for method" + method.getName());
 
-
-            // TODO: Is there a testcase for this time-out ? If not, lets skip this, because
-            // is_available doesnt check remote socket state anyways.
-
-
-            // int i = 0;
-            // while(i < Utility.MAX_WAIT && is.available() == 0) {
-            //     try {
-            //         Thread.sleep(Utility.SLEEPTIME);
-            //     } catch (InterruptedException ex) {
-            //         Thread.currentThread().interrupt();
-            //     }
-            //     i += 1;
-            // }
-
-            //if (is.available() != 0) {
-
-
-
-
             invoke_status = (boolean) ois.readObject();
             result = ois.readObject();
 
@@ -156,7 +136,11 @@ public class StubProxy implements InvocationHandler, Serializable
     }
 
     private String toString(Object proxy, StubProxy handler) {
-        return proxy.getClass().getName() + " " + handler.address.toString();
+        String s = "";
+        for (Class c : proxy.getClass().getInterfaces())
+            s = s.concat(c.toString());
+
+        return s + " " + handler.address.toString();
     }
 
     private boolean equals(Object proxy, Object other) {

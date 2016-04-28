@@ -40,7 +40,7 @@ public class ConformanceTests
                          conformance.rmi.StubTest.class,
                          conformance.rmi.EqualsTest.class,
                          conformance.rmi.HashCodeTest.class,
-                        //  conformance.rmi.ToStringTest.class,
+                         conformance.rmi.ToStringTest.class,
                          conformance.rmi.SerializableTest.class,
                         //  conformance.rmi.OverloadTest.class,
                          conformance.rmi.ShadowTest.class,
