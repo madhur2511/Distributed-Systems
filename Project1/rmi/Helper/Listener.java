@@ -27,6 +27,7 @@ public class Listener<T> implements Runnable{
             }
         }
         catch(Exception e){
+
         }
         finally{
             try{
