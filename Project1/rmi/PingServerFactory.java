@@ -4,7 +4,6 @@ import rmi.*;
 import java.io.*;
 import java.net.*;
 import java.lang.*;
-import rmi.Helper.*;
 import java.util.logging.*;
 
 public class PingServerFactory implements PingServerFactoryInterface

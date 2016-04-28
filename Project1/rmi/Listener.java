@@ -1,4 +1,4 @@
-package rmi.Helper;
+package rmi;
 import java.net.*;
 import java.io.*;
 import rmi.*;
@@ -6,9 +6,9 @@ import java.util.logging.*;
 
 public class Listener<T> implements Runnable{
 
-    protected ServerSocket listener = null;
-    protected InetSocketAddress address = null;
-    protected Skeleton<T> skeletonReference = null;
+    private ServerSocket listener = null;
+    private InetSocketAddress address = null;
+    private Skeleton<T> skeletonReference = null;
     //private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public Listener(Skeleton<T> skeletonReference, ServerSocket listener){

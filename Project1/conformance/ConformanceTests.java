@@ -25,16 +25,16 @@ public class ConformanceTests
         @SuppressWarnings("unchecked")
         Class<? extends Test>[]     tests =
             new Class[] {
-                        //  conformance.rmi.CallTest.class,
-                        //  conformance.rmi.ArgumentTest.class,
+                         conformance.rmi.CallTest.class,
+                         conformance.rmi.ArgumentTest.class,
                         //  conformance.rmi.ReturnTest.class,
-                        //  conformance.rmi.ExceptionTest.class,
-                        //  conformance.rmi.CompleteCallTest.class,
-                        //  conformance.rmi.ImplicitStubCallTest.class,
+                         conformance.rmi.ExceptionTest.class,
+                         conformance.rmi.CompleteCallTest.class,
+                         conformance.rmi.ImplicitStubCallTest.class,
                          conformance.rmi.NullTest.class,
                          conformance.rmi.RemoteInterfaceTest.class,
                          conformance.rmi.ListenTest.class,
-                        //  conformance.rmi.RestartTest.class,
+                         conformance.rmi.RestartTest.class,
                          conformance.rmi.NoAddressTest.class,
                         //  conformance.rmi.ServiceErrorTest.class,
                          conformance.rmi.StubTest.class,
@@ -42,10 +42,10 @@ public class ConformanceTests
                          conformance.rmi.HashCodeTest.class,
                          conformance.rmi.ToStringTest.class,
                          conformance.rmi.SerializableTest.class,
-                        //  conformance.rmi.OverloadTest.class,
+                         conformance.rmi.OverloadTest.class,
                          conformance.rmi.ShadowTest.class,
-                        //  conformance.rmi.InheritanceTest.class,
-                        //  conformance.rmi.SubclassTest.class,
+                         conformance.rmi.InheritanceTest.class,
+                         conformance.rmi.SubclassTest.class,
                         //  conformance.rmi.SecurityTest.class,
                         //  conformance.rmi.ThreadTest.class
                     };

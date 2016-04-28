@@ -1,4 +1,4 @@
-package rmi.Helper;
+package rmi;
 import rmi.*;
 import java.util.*;
 import java.lang.reflect.*;

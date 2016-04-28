@@ -1,5 +1,4 @@
 package conformance.rmi;
-
 import rmi.*;
 import test.*;
 import java.io.FileNotFoundException;

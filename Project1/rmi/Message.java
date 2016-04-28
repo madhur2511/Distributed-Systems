@@ -1,4 +1,4 @@
-package rmi.Helper;
+package rmi;
 import java.net.*;
 import java.io.*;
 import rmi.*;

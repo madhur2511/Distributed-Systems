@@ -1,4 +1,4 @@
-package rmi.Helper;
+package rmi;
 import java.io.*;
 import java.net.Socket;
 import java.net.InetSocketAddress;
