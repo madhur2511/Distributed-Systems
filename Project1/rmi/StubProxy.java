@@ -1,4 +1,5 @@
 package rmi;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.InetSocketAddress;
@@ -42,13 +43,8 @@ public class StubProxy implements InvocationHandler, Serializable
 
         try {
             Class[] argTypes = m.getParameterTypes();
-
-            method = proxy.getClass().getMethod(m.getName(), argTypes);
-            if (method == null) {
-                // logger.log(Level.WARNING, "Could not find a matching method. METHOD: " + m + " ARGS: " + args);
-                throw new Exception("remote interface: " + proxy.getClass().getName() + " does not implement the method: "
-                                    + m.getName() + "(" + argTypes + ")");
-            }
+            // Note that, we should not be matching up method signatures on the
+            // client side. server is the right place to do this.
 
             socket = new Socket(address.getAddress(), address.getPort());
             oos = new ObjectOutputStream(socket.getOutputStream());
@@ -60,13 +56,13 @@ public class StubProxy implements InvocationHandler, Serializable
             //                        + address.getAddress() + ":" + address.getPort());
 
             Message msg = new Message();
-            msg.setMethodName(method.getName());
+            msg.setMethodName(m.getName());
             msg.setArgs(args);
             msg.setArgTypes(argTypes);
 
             oos.writeObject(msg);
 
-            System.out.println("StubProxy asking for method" + method.getName());
+            System.out.println("StubProxy asking for method" + m.getName());
 
             invoke_status = (boolean) ois.readObject();
             result = ois.readObject();
@@ -84,7 +80,7 @@ public class StubProxy implements InvocationHandler, Serializable
             // }
 
         } catch (Exception e) {
-
+            System.out.println("Exception: " + e);
 
             //TODO: NEED TO VERIFY THIS ONCE
             //TODO: NEED TO VERIFY THIS ONCE
@@ -100,7 +96,7 @@ public class StubProxy implements InvocationHandler, Serializable
             throw new RMIException(e);
         } finally {
             try {
-                if(!socket.isClosed())
+                if((socket != null) && !socket.isClosed())
                     socket.close();
             }
             catch (IOException e) {

@@ -27,7 +27,7 @@ public class ConformanceTests
             new Class[] {
                          conformance.rmi.CallTest.class,
                          conformance.rmi.ArgumentTest.class,
-                        //  conformance.rmi.ReturnTest.class,
+                         conformance.rmi.ReturnTest.class,
                          conformance.rmi.ExceptionTest.class,
                          conformance.rmi.CompleteCallTest.class,
                          conformance.rmi.ImplicitStubCallTest.class,
@@ -36,7 +36,7 @@ public class ConformanceTests
                          conformance.rmi.ListenTest.class,
                          conformance.rmi.RestartTest.class,
                          conformance.rmi.NoAddressTest.class,
-                        //  conformance.rmi.ServiceErrorTest.class,
+                         conformance.rmi.ServiceErrorTest.class,
                          conformance.rmi.StubTest.class,
                          conformance.rmi.EqualsTest.class,
                          conformance.rmi.HashCodeTest.class,
@@ -46,8 +46,8 @@ public class ConformanceTests
                          conformance.rmi.ShadowTest.class,
                          conformance.rmi.InheritanceTest.class,
                          conformance.rmi.SubclassTest.class,
-                        //  conformance.rmi.SecurityTest.class,
-                        //  conformance.rmi.ThreadTest.class
+                         conformance.rmi.SecurityTest.class,
+                         //conformance.rmi.ThreadTest.class       // fails
                     };
 
         Series                      series = new Series(tests);

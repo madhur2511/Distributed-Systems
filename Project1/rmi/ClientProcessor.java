@@ -13,11 +13,13 @@ public class ClientProcessor<T> implements Runnable{
     private Class<T> classObject = null;
     private ObjectInputStream ois = null;
     private ObjectOutputStream oos = null;
+    private Skeleton<T> skelRef = null;
 
-    public ClientProcessor(Socket clientSocket, T serverObject, Class<T> classObject) {
+    public ClientProcessor(Socket clientSocket, T serverObject, Class<T> classObject, Skeleton<T> skelRef) {
         this.clientSocket = clientSocket;
         this.serverObject = serverObject;
         this.classObject = classObject;
+        this.skelRef = skelRef;
     }
 
     public void run() {
@@ -39,7 +41,12 @@ public class ClientProcessor<T> implements Runnable{
                 msgObj = (Message)readObj;
 
                 synchronized(serverObject) {
-                    m = serverObject.getClass().getMethod(msgObj.getMethodName(), msgObj.getArgTypes());
+                    m = classObject.getMethod(msgObj.getMethodName(), msgObj.getArgTypes());
+
+                    if (m == null)
+                        throw new Exception("Exception: Server interface " +  classObject.getName() +
+                                            " does not include method " + msgObj.getMethodName());
+
                     m.setAccessible(true);
                     returnObj = m.invoke(serverObject, msgObj.getArgs());
                 }
@@ -59,14 +66,15 @@ public class ClientProcessor<T> implements Runnable{
         }
         catch (SocketException e) {}
         catch (Exception e) {
-            e.printStackTrace();
+            skelRef.service_error(new RMIException(e));
             try {
                 oos.writeObject(Utility.INVOKE_FAILURE);
-                oos.writeObject(e);
+                oos.writeObject(new RMIException(e));
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
             e.printStackTrace();
+
         } finally {
             try {
                 clientSocket.close();

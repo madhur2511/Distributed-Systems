@@ -193,7 +193,7 @@ public class Skeleton<T>
 
     public synchronized void newClient(Socket clientSocket){
         // logger.log(Level.INFO, "Spawning a thread for the new client: " + clientSocket);
-        new Thread(new ClientProcessor<T>(clientSocket, serverObject, classObject)).start();
+        new Thread(new ClientProcessor<T>(clientSocket, serverObject, classObject, this)).start();
     }
 
     /** Stops the skeleton server, if it is already running.
