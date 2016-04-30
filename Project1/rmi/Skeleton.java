@@ -2,7 +2,7 @@ package rmi;
 import rmi.*;
 import java.io.*;
 import java.net.*;
-import java.net.*;
+import java.util.Random;
 import java.lang.reflect.*;
 import java.util.logging.*;
 

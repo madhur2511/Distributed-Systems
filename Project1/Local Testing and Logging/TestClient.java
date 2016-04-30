@@ -19,6 +19,7 @@ public class TestClient{
             result = proxyTest.testMessage("Hello");
             System.out.println("SUCCESS: Result : " + result);
             System.out.println("SUCCESS: Result : " + proxyTest.addNum(1, 3));
+            System.out.println("SUCCESS: Result : " + proxyTest.addNum(2, 4));
             proxyTest.boolMirror(true);
             System.out.println(proxyTest.toString());
             result = proxyTest.exceptionThrower("junk");

@@ -40,20 +40,18 @@ public class ClientProcessor<T> implements Runnable{
             if (readObj != null && readObj instanceof Message) {
                 msgObj = (Message)readObj;
 
-                synchronized(serverObject) {
-                    m = classObject.getMethod(msgObj.getMethodName(), msgObj.getArgTypes());
+                m = classObject.getMethod(msgObj.getMethodName(), msgObj.getArgTypes());
 
-                    if (m == null)
-                        throw new Exception("Exception: Server interface " +  classObject.getName() +
-                                            " does not include method " + msgObj.getMethodName());
+                if (m == null)
+                    throw new Exception("Exception: Server interface " +  classObject.getName() +
+                                        " does not include method " + msgObj.getMethodName());
 
-                    m.setAccessible(true);
-                    returnObj = m.invoke(serverObject, msgObj.getArgs());
-                }
+                returnObj = m.invoke(serverObject, msgObj.getArgs());
+
                 oos.writeObject(Utility.INVOKE_SUCCESS);
                 oos.writeObject(returnObj);
 
-                System.out.println("Skeleton responding with " + returnObj);
+                // System.out.println("Skeleton responding with " + returnObj);
             }
         }
         catch (InvocationTargetException e) {
@@ -70,16 +68,16 @@ public class ClientProcessor<T> implements Runnable{
             try {
                 oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(new RMIException(e));
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (Exception e1) {
+                // e1.printStackTrace();
             }
-            e.printStackTrace();
+            // e.printStackTrace();
 
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
     }

@@ -20,9 +20,8 @@ public class Listener<T> implements Runnable{
         try{
             while(true){
                 Socket clientSocket = listener.accept();
-                System.out.println("Connected to client: " + clientSocket.getInetAddress());
-
-    //            logger.log(Level.INFO, "Connected to client: " + clientSocket.getInetAddress());
+                // System.out.println("Connected to client: " + clientSocket.getInetAddress());
+               // logger.log(Level.INFO, "Connected to client: " + clientSocket.getInetAddress());
                 skeletonReference.newClient(clientSocket);
             }
         }

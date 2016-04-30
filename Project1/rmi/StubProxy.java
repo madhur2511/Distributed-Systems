@@ -62,12 +62,12 @@ public class StubProxy implements InvocationHandler, Serializable
 
             oos.writeObject(msg);
 
-            System.out.println("StubProxy asking for method" + m.getName());
+            // System.out.println("StubProxy asking for method" + m.getName());
 
             invoke_status = (boolean) ois.readObject();
             result = ois.readObject();
 
-            System.out.println("Received result at client stubproxy: " + result);
+            // System.out.println("Received result at client stubproxy: " + result);
 
 
             //logger.log(Level.INFO, "Remote Invocation STATUS: " + invoke_status +
@@ -80,18 +80,7 @@ public class StubProxy implements InvocationHandler, Serializable
             // }
 
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
-
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-            //TODO: NEED TO VERIFY THIS ONCE
-
-            //logger.log(Level.WARNING, "remoteInvoke Failed, err: " + e);
+            // System.out.println("Exception: " + e);
 
             throw new RMIException(e);
         } finally {

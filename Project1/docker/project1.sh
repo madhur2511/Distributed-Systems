@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cd ../rmi
-javac -d "classes" *.java Helper/*.java
+javac -d "classes" *.java
 rm -rf ../docker/rmi_node/classes
 cp -rf classes ../docker/rmi_node
 
