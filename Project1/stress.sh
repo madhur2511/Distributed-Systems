@@ -4,5 +4,6 @@ runs=0
 while [ $runs -lt 1000 ]
 do
     runs=`expr $runs + 1`
-    make test | grep -i "passed: "
+    make test >> ./makeout
+    sleep 1
 done

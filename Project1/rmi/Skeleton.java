@@ -213,6 +213,11 @@ public class Skeleton<T>
             }catch(IOException e){
                 // e.printStackTrace();
             }
+            try{
+                Thread.sleep(10);
+            }catch(InterruptedException e){
+                // e.printStackTrace();
+            }
            this.stopped(null);
         }
     }
