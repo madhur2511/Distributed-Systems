@@ -30,20 +30,18 @@ public class PingPongClient{
             if (clientProxy == null)
                 throw new Exception("Something bad happened.");
 
-            System.out.println("Ping Server Stub created");
-
             for (id = 0; id < 4; id++) {
                 result = clientProxy.ping(id);
-                System.out.println("RESULT: " + result);
+                System.out.println(result);
                 if (result.equals("Pong, ID: " + id))
                     pass += 1;
             }
 
         } catch (Exception e) {
             // logger.log(Level.INFO, "Exception: " + e);
-            e.printStackTrace();
+            // e.printStackTrace();
         } finally {
-            System.out.println(pass + " Tests Completed, " + (4-pass) + " Tests Failed.");
+            System.out.println(pass + " Tests Completed, " + (4 - pass) + " Tests Failed.");
             // logger.log(Level.INFO, pass + " Tests Completed, " + (4-pass) + " Tests Failed.");
         }
     }

@@ -50,7 +50,6 @@ public class ClientProcessor<T> implements Runnable{
 
                 oos.writeObject(Utility.INVOKE_SUCCESS);
                 oos.writeObject(returnObj);
-
                 // System.out.println("Skeleton responding with " + returnObj);
             }
         }
@@ -59,7 +58,7 @@ public class ClientProcessor<T> implements Runnable{
                 oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(e.getTargetException());
             } catch (IOException e1) {
-                e1.printStackTrace();
+                // e1.printStackTrace();
             }
         }
         catch (SocketException e) {}
@@ -69,15 +68,12 @@ public class ClientProcessor<T> implements Runnable{
                 oos.writeObject(Utility.INVOKE_FAILURE);
                 oos.writeObject(new RMIException(e));
             } catch (Exception e1) {
-                // e1.printStackTrace();
             }
-            // e.printStackTrace();
 
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                // e.printStackTrace();
             }
         }
     }

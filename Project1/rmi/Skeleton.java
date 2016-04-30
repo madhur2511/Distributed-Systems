@@ -66,7 +66,7 @@ public class Skeleton<T>
         if (c == null || server == null)
             throw new NullPointerException("Either class interface or server instance is missing");
 
-        if (!checkRemoteInterfaceImplementation(c))
+        if (!Utility.isValidRemoteInterface(c))
             throw new Error("The type variable given doesnt represent a remote interface");
 
         this.serverObject = server;
@@ -97,7 +97,7 @@ public class Skeleton<T>
         if (c == null || server == null)
             throw new NullPointerException("Either class interface or server instance missing");
 
-        if (!checkRemoteInterfaceImplementation(c))
+        if (!Utility.isValidRemoteInterface(c))
             throw new Error();
 
         this.serverObject = server;
@@ -184,7 +184,7 @@ public class Skeleton<T>
             try{
                 Thread.sleep(10);
             }catch(InterruptedException e){
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }catch(Throwable e){
             throw new RMIException(e);
@@ -211,19 +211,9 @@ public class Skeleton<T>
             try{
                 listener.close();
             }catch(IOException e){
-                e.printStackTrace();
+                // e.printStackTrace();
             }
            this.stopped(null);
         }
-    }
-
-    private synchronized boolean checkRemoteInterfaceImplementation(Class<T> c){
-        Method[] methods = c.getMethods();
-        int count = 0;
-        for (Method method : methods)
-            for (Class exceptionClass : method.getExceptionTypes())
-                if (exceptionClass == RMIException.class)
-                    count += 1;
-        return count == methods.length ? true : false;
     }
 }

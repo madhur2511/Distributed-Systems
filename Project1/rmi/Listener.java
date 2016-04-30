@@ -25,14 +25,12 @@ public class Listener<T> implements Runnable{
                 skeletonReference.newClient(clientSocket);
             }
         }
-        catch(Exception e){
-
-        }
+        catch(Exception e) {}
         finally{
             try{
                 if(!listener.isClosed())
                     listener.close();
-            }catch(Exception e){}
+            }catch(Exception e) {}
         }
     }
 }

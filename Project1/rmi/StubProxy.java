@@ -81,7 +81,6 @@ public class StubProxy implements InvocationHandler, Serializable
 
         } catch (Exception e) {
             // System.out.println("Exception: " + e);
-
             throw new RMIException(e);
         } finally {
             try {
@@ -89,11 +88,10 @@ public class StubProxy implements InvocationHandler, Serializable
                     socket.close();
             }
             catch (IOException e) {
-                System.out.println(e);
             }
         }
         if (invoke_status != Utility.INVOKE_SUCCESS) {
-            System.out.println(result.toString());
+            // System.out.println(result.toString());
             throw (Throwable)result;
         }
         return result;

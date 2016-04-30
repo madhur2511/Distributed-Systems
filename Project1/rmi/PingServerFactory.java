@@ -18,7 +18,6 @@ public class PingServerFactory implements PingServerFactoryInterface
     public Object makePingServer() throws RMIException {
 
         InetSocketAddress addr1 = new InetSocketAddress("rmiserver", port);
-        // InetSocketAddress addr1 = new InetSocketAddress("localhost", port);
         port += 1;
         PingPongServer pingserver = new PingPongServer(addr1);
 
@@ -36,9 +35,9 @@ public class PingServerFactory implements PingServerFactoryInterface
 
         } catch(RMIException e) {
             // logger.log(Level.WARNING, "unable to create ping server, " + e);
-            e.printStackTrace();
+            // e.printStackTrace();
         } catch(Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return null;
     }
@@ -59,7 +58,7 @@ public class PingServerFactory implements PingServerFactoryInterface
         catch (Exception e)
         {
             // logger.log(Level.WARNING, "failed to start PingServerFactory skeleton, err: " + e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 }
