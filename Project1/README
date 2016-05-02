@@ -21,8 +21,13 @@ conformance and run 'make test' from the root of the project, or use the existin
 
 Results from our end:
 1. All 4/4 tests pass for Docker.
-2. All 23/23 tests pass in the RMI conformance on Linux machines. On Mac/Windows machines, it passes almost
-always, with 1 occasional timeout, which is quite rare. In case that rare occasion must occur,
-please re-run make test, and it would surely pass with all 23/23 tests.
+
+2. RMI Library was tested locally on Linux, Mac machine and on Docker environment.
+
+    a. All 23/23 tests pass on local linux machine. On Mac machine, it passes almost
+    always, with 1 occasional timeout, which is quite rare. In case that rare occasion must occur,
+    please re-run make test, and it would surely pass with all 23/23 tests.
+
+    b. All 23/23 tests pass in the Docker environment with separate client and server containers.
 
 We stress-tested the RMI tests for a 1000 times. On Linux machines all 1000 tests passed.
