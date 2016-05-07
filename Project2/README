@@ -31,7 +31,7 @@ Various tests can be run by executing:
         java conformance.ConformanceTests
         java -cp ./:./unit unit.UnitTests
         java test.SelfTest
-Conformance tests check the public interfaces of the classes in the various
+Conformance tests check the public interfaces of the classes in the various 
 packages for conformance to the written specifications. The tests are thorough
 but not exhaustive. Conformance tests are grouped by the packages they test. For
 example, conformance tests for the RMI library, which is in the package rmi, are
