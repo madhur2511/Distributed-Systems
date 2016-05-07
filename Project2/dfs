@@ -14,7 +14,7 @@
 # Additionally, if the user has set the current host to unix.qatar.cmu.edu and
 # the current directory to directory using the cd command, it is sufficient to
 # write
-#       ./dfs touch some-file.txt
+#       ./dfs touch some-file.txt 
 #
 # The current host and current directory are stored in the environment variables
 # DFSHOST and DFSCWD, respectively. The path parser accesses these environment
