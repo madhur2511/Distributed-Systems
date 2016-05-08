@@ -91,7 +91,6 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
     @Override
     public Iterator<String> iterator()
     {
-        System.out.println("fehbjkebcbe");
         String[] splits = this.pathString.split("/");
         ArrayList<String> temp = new ArrayList<String>();
         for(int i = 0; i < splits.length; ++i){
