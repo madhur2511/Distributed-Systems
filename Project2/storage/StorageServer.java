@@ -16,6 +16,14 @@ import naming.*;
  */
 public class StorageServer implements Storage, Command
 {
+    private File localRoot;
+    private int clientPort;
+    private int commandPort;
+    private Skeleton storageSkeleton;
+    private Skeleton commandSkeleton;
+    private Registration naming_server;
+    private String hostname;
+
     /** Creates a storage server, given a directory on the local filesystem, and
         ports to use for the client and command interfaces.
 
@@ -33,7 +41,17 @@ public class StorageServer implements Storage, Command
     */
     public StorageServer(File root, int client_port, int command_port)
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (root == null)
+            throw new NullPointerException("Root is null");
+
+        if (client_port == 0)
+            client_port = 12000;
+        if (command_port == 0)
+            command_port = 11000;
+
+        this.localRoot = root;
+        this.storageSkeleton = new Skeleton(Storage.class,this,new InetSocketAddress(client_port));
+        this.commandSkeleton = new Skeleton(Command.class,this,new InetSocketAddress(command_port));
     }
 
     /** Creats a storage server, given a directory on the local filesystem.
@@ -49,7 +67,27 @@ public class StorageServer implements Storage, Command
      */
     public StorageServer(File root)
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (root == null)
+            throw new NullPointerException("Root is null");
+
+        this.localRoot = root;
+        storageSkeleton = new Skeleton(Storage.class,this,new InetSocketAddress(12000));
+        commandSkeleton = new Skeleton(Command.class,this,new InetSocketAddress(11000));
+
+    }
+
+    private synchronized void deleteEmptyDirs(File dir) {
+        if (dir.isDirectory() == false)
+            return;
+
+        if (dir.list().length > 0) {
+            for (File s : dir.listFiles()) {
+                deleteEmptyDirs(s);
+            }
+        }
+
+        if (dir.list().length == 0)
+            dir.delete();
     }
 
     /** Starts the storage server and registers it with the given naming
@@ -75,7 +113,35 @@ public class StorageServer implements Storage, Command
     public synchronized void start(String hostname, Registration naming_server)
         throws RMIException, UnknownHostException, FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        // TODO if (!hostname) throw UnknownHostException
+        if (hostname == null)
+            throw new UnknownHostException("Hostname given is null");
+
+        if (localRoot.exists() == false || localRoot.isDirectory() == false)
+            throw new FileNotFoundException("Either directory doesn't exists or is a file");
+
+        this.hostname = hostname;
+        this.naming_server = naming_server;
+
+        try {
+            commandSkeleton.start();
+            storageSkeleton.start();
+
+            Path[] delFiles = naming_server.register(
+                    Stub.create(Storage.class, storageSkeleton, hostname),
+                    Stub.create(Command.class, commandSkeleton, hostname),
+                    Path.list(localRoot));
+
+            for (int i = 0; i < delFiles.length; i++) {
+                System.out.println(delFiles[i].toString());
+                delete(delFiles[i]);
+            }
+
+            deleteEmptyDirs(localRoot);
+        }
+        catch (Exception e) {
+            throw new RMIException(e);
+        }
     }
 
     /** Stops the storage server.
@@ -85,7 +151,8 @@ public class StorageServer implements Storage, Command
      */
     public void stop()
     {
-        throw new UnsupportedOperationException("not implemented");
+            commandSkeleton.stop();
+            storageSkeleton.stop();
     }
 
     /** Called when the storage server has shut down.
@@ -128,7 +195,14 @@ public class StorageServer implements Storage, Command
     @Override
     public synchronized boolean delete(Path path)
     {
-        throw new UnsupportedOperationException("not implemented");
+        File temp = path.toFile(localRoot);
+        if (temp.isDirectory()) {
+            for (String s : temp.list()) {
+                if (delete(new Path(s))== false)
+                    return false;
+            }
+        }
+        return temp.delete();
     }
 
     @Override

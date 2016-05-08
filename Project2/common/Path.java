@@ -202,7 +202,10 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
      */
     public File toFile(File root)
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (root != null)
+            return new File(root, this.toString());
+        else
+            return new File(this.toString());
     }
 
     /** Compares this path to another.

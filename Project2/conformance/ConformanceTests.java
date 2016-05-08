@@ -34,11 +34,11 @@ public class ConformanceTests
         @SuppressWarnings("unchecked")
         Class<? extends Test>[]     tests =
             new Class[] {conformance.common.PathTest.class,
-                        //  conformance.rmi.SkeletonTest.class,
-                        //  conformance.rmi.StubTest.class,
-                        //  conformance.rmi.ConnectionTest.class,
-                        //  conformance.rmi.ThreadTest.class,
-                        //  conformance.storage.RegistrationTest.class,
+                         conformance.rmi.SkeletonTest.class,
+                         conformance.rmi.StubTest.class,
+                         conformance.rmi.ConnectionTest.class,
+                         conformance.rmi.ThreadTest.class,
+                         conformance.storage.RegistrationTest.class,
                         //  conformance.storage.AccessTest.class,
                         //  conformance.storage.DirectoryTest.class,
                         //  conformance.naming.ContactTest.class,
