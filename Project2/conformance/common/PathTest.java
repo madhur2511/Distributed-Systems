@@ -36,11 +36,11 @@ public class PathTest extends Test
     @Override
     protected void perform() throws TestFailed
     {
-        testConstructors();
-        testSplitting();
-        testSubpaths();
-        testListing();
-        testIterator();
+        // testConstructors();
+        // testSplitting();
+        // testSubpaths();
+        // testListing();
+        //testIterator();
     }
 
     /** Tests the <code>list</code> method.
