@@ -92,13 +92,16 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
     public Iterator<String> iterator()
     {
         String[] splits = this.pathString.split("/");
-        ArrayList<String> temp = new ArrayList<String>();
+
+        //ArrayList<String> temp = new ArrayList<String>();
+        String[] temp = new String[splits.length-1];
+
+        int j = 0;
         for(int i = 0; i < splits.length; ++i){
-            System.out.println(splits[i]);
             if(!splits[i].isEmpty())
-                temp.add(splits[i]);
+                temp[j++] = splits[i];
         }
-        return temp.iterator();
+        return Arrays.asList(temp).iterator();
     }
 
     /** Lists the paths of all files in a directory tree on the local
