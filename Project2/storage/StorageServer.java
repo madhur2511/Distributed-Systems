@@ -19,11 +19,46 @@ public class StorageServer implements Storage, Command
     private File localRoot;
     private int clientPort;
     private int commandPort;
-    private Skeleton storageSkeleton;
-    private Skeleton commandSkeleton;
+    private StorageSkeleton stoSkeleton;
+    private CommandSkeleton cmdSkeleton;
+    private volatile boolean stoStopped;
+    private volatile boolean cmdStopped;
     private Registration naming_server;
     private String hostname;
 
+    // Override neccessary skeleton methods for storage server.
+    private class StorageSkeleton extends Skeleton<Storage> {
+        public StorageSkeleton(Storage s, InetSocketAddress addr) {
+            super(Storage.class, s, addr);
+        }
+
+        @Override
+        protected void stopped(Throwable e) {
+            synchronized (this) {
+                StorageServer.this.stoStopped = true;
+                if (StorageServer.this.cmdStopped = true) {
+                    StorageServer.this.stopped(null);
+                }
+            }
+        }
+    }
+
+    // Override neccessary skeleton methods for command server.
+    private class CommandSkeleton extends Skeleton<Command> {
+        public CommandSkeleton(Command s, InetSocketAddress addr) {
+            super(Command.class, s, addr);
+        }
+
+        @Override
+        protected void stopped(Throwable e) {
+            synchronized (this) {
+                StorageServer.this.cmdStopped = true;
+                if (StorageServer.this.stoStopped = true) {
+                    StorageServer.this.stopped(null);
+                }
+            }
+        }
+    }
     /** Creates a storage server, given a directory on the local filesystem, and
         ports to use for the client and command interfaces.
 
@@ -50,8 +85,8 @@ public class StorageServer implements Storage, Command
             command_port = 11000;
 
         this.localRoot = root;
-        this.storageSkeleton = new Skeleton(Storage.class,this,new InetSocketAddress(client_port));
-        this.commandSkeleton = new Skeleton(Command.class,this,new InetSocketAddress(command_port));
+        this.stoSkeleton = new StorageSkeleton(this, new InetSocketAddress(client_port));
+        this.cmdSkeleton = new CommandSkeleton(this, new InetSocketAddress(command_port));
     }
 
     /** Creats a storage server, given a directory on the local filesystem.
@@ -71,8 +106,8 @@ public class StorageServer implements Storage, Command
             throw new NullPointerException("Root is null");
 
         this.localRoot = root;
-        storageSkeleton = new Skeleton(Storage.class,this,new InetSocketAddress(12000));
-        commandSkeleton = new Skeleton(Command.class,this,new InetSocketAddress(11000));
+        stoSkeleton = new StorageSkeleton(this, new InetSocketAddress(12000));
+        cmdSkeleton = new CommandSkeleton(this, new InetSocketAddress(11000));
 
     }
 
@@ -123,12 +158,12 @@ public class StorageServer implements Storage, Command
         this.naming_server = naming_server;
 
         try {
-            commandSkeleton.start();
-            storageSkeleton.start();
+            cmdSkeleton.start();
+            stoSkeleton.start();
 
             Path[] delFiles = naming_server.register(
-                    Stub.create(Storage.class, storageSkeleton, hostname),
-                    Stub.create(Command.class, commandSkeleton, hostname),
+                    Stub.create(Storage.class, stoSkeleton, hostname),
+                    Stub.create(Command.class, cmdSkeleton, hostname),
                     Path.list(localRoot));
 
             for (int i = 0; i < delFiles.length; i++) {
@@ -149,8 +184,8 @@ public class StorageServer implements Storage, Command
      */
     public void stop()
     {
-            commandSkeleton.stop();
-            storageSkeleton.stop();
+            cmdSkeleton.stop();
+            stoSkeleton.stop();
     }
 
     /** Called when the storage server has shut down.

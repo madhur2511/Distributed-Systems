@@ -33,8 +33,43 @@ import storage.*;
  */
 public class NamingServer implements Service, Registration
 {
-    private Skeleton svcSkeleton;
-    private Skeleton regSkeleton;
+    private ServiceSkeleton svcSkeleton;
+    private RegistrationSkeleton regSkeleton;
+    private volatile boolean svcStopped;
+    private volatile boolean regStopped;
+
+    // Override neccessary skeleton methods for service server.
+    private class ServiceSkeleton extends Skeleton<Service> {
+        public ServiceSkeleton(Service s) {
+            super(Service.class, s, new InetSocketAddress(NamingStubs.SERVICE_PORT));
+        }
+
+        @Override
+        protected void stopped(Throwable e) {
+            synchronized (this) {
+                NamingServer.this.svcStopped = true;
+                if (NamingServer.this.regStopped = true) {
+                    NamingServer.this.stopped(null);
+                }
+            }
+        }
+    }
+
+    // Override neccessary skeleton methods for registration server.
+    private class RegistrationSkeleton extends Skeleton<Registration> {
+        public RegistrationSkeleton(Registration s) {
+            super(Registration.class, s, new InetSocketAddress(NamingStubs.REGISTRATION_PORT));
+        }
+        @Override
+        protected void stopped(Throwable e) {
+            synchronized (this) {
+                NamingServer.this.regStopped = true;
+                if (NamingServer.this.svcStopped = true) {
+                    NamingServer.this.stopped(null);
+                }
+            }
+        }
+    }
 
     /** Creates the naming server object.
 
@@ -43,8 +78,8 @@ public class NamingServer implements Service, Registration
      */
     public NamingServer()
     {
-        this.svcSkeleton = new Skeleton(Service.class, this, new InetSocketAddress(NamingStubs.SERVICE_PORT));
-        this.regSkeleton = new Skeleton(Registration.class, this, new InetSocketAddress(NamingStubs.REGISTRATION_PORT));
+        this.svcSkeleton = new ServiceSkeleton(this);
+        this.regSkeleton = new RegistrationSkeleton(this);
     }
 
     /** Starts the naming server.
@@ -81,8 +116,6 @@ public class NamingServer implements Service, Registration
     {
         svcSkeleton.stop();
         regSkeleton.stop();
-        // TODO: below stopped() has to be called only after both svcSkeleton and regSkeleton have been stopped.
-        this.stopped(null);
     }
 
     /** Indicates that the server has completely shut down.
