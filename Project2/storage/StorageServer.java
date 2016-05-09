@@ -133,7 +133,6 @@ public class StorageServer implements Storage, Command
                     Path.list(localRoot));
 
             for (int i = 0; i < delFiles.length; i++) {
-                System.out.println(delFiles[i].toString());
                 delete(delFiles[i]);
             }
 
@@ -168,37 +167,113 @@ public class StorageServer implements Storage, Command
     @Override
     public synchronized long size(Path file) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (file == null) {
+            throw new NullPointerException("File path is null");
+        }
+        File f = file.toFile(localRoot);
+        if (f.exists() == false || f.isDirectory() == true) {
+            throw new FileNotFoundException("Either file does not exists or is a directory");
+        }
+        return f.length();
     }
 
     @Override
     public synchronized byte[] read(Path file, long offset, int length)
         throws FileNotFoundException, IOException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (file == null) {
+            throw new NullPointerException("File path is null");
+        }
+
+        File f = file.toFile(localRoot);
+        if (f.exists() == false || f.isDirectory() == true) {
+            throw new FileNotFoundException("Either file does not exists or s a directory");
+        }
+
+        if (offset < 0 || offset > Long.MAX_VALUE ||
+            length < 0 || (offset + length) > f.length()) {
+                throw new IndexOutOfBoundsException("Out of bound read");
+        }
+        if (length == 0) {
+            return "".getBytes();
+        }
+        byte[] result = new byte[length];
+        RandomAccessFile raf = new RandomAccessFile(f, "r");
+
+        raf.seek(offset);
+        raf.readFully(result);
+        return result;
     }
 
     @Override
     public synchronized void write(Path file, long offset, byte[] data)
         throws FileNotFoundException, IOException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (file == null) {
+            throw new NullPointerException("File path is null");
+        }
+
+        File f = file.toFile(localRoot);
+        if (f.exists() == false || f.isDirectory() == true) {
+            throw new FileNotFoundException("Either file does not exists or is a directory");
+        }
+
+        if (data == null) {
+            throw new NullPointerException("Null data");
+        }
+        if (offset < 0 || offset > Long.MAX_VALUE) {
+                throw new IndexOutOfBoundsException("Out of bound write");
+        }
+        if (data.length == 0) {
+            return;
+        }
+
+        RandomAccessFile raf = new RandomAccessFile(f, "rw");
+
+        raf.seek(offset);
+        raf.write(data);
     }
 
     // The following methods are documented in Command.java.
     @Override
     public synchronized boolean create(Path file)
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (file == null) {
+            throw new NullPointerException("File path is null");
+        }
+
+        File f = file.toFile(localRoot);
+        if (file.isRoot() || f.exists()) {
+            return false;
+        }
+
+        if (!f.getParentFile().exists()) {
+            if (!f.getParentFile().mkdirs()) {
+                return false;
+            }
+        }
+        try {
+            return f.createNewFile();
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     @Override
     public synchronized boolean delete(Path path)
     {
+        if (path == null) {
+            throw new NullPointerException("File path is null");
+        }
+
         File temp = path.toFile(localRoot);
+        if (path.isRoot() || !temp.exists()) {
+            return false;
+        }
+
         if (temp.isDirectory()) {
             for (String s : temp.list()) {
-                if (delete(new Path(s))== false)
+                if (delete(new Path(path, s)) == false)
                     return false;
             }
         }
