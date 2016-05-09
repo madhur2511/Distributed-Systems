@@ -113,7 +113,6 @@ public class StorageServer implements Storage, Command
     public synchronized void start(String hostname, Registration naming_server)
         throws RMIException, UnknownHostException, FileNotFoundException
     {
-        // TODO if (!hostname) throw UnknownHostException
         if (hostname == null)
             throw new UnknownHostException("Hostname given is null");
 

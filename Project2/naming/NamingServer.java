@@ -33,6 +33,9 @@ import storage.*;
  */
 public class NamingServer implements Service, Registration
 {
+    private Skeleton svcSkeleton;
+    private Skeleton regSkeleton;
+
     /** Creates the naming server object.
 
         <p>
@@ -40,7 +43,8 @@ public class NamingServer implements Service, Registration
      */
     public NamingServer()
     {
-        throw new UnsupportedOperationException("not implemented");
+        this.svcSkeleton = new Skeleton(Service.class, this, new InetSocketAddress(NamingStubs.SERVICE_PORT));
+        this.regSkeleton = new Skeleton(Registration.class, this, new InetSocketAddress(NamingStubs.REGISTRATION_PORT));
     }
 
     /** Starts the naming server.
@@ -56,7 +60,12 @@ public class NamingServer implements Service, Registration
      */
     public synchronized void start() throws RMIException
     {
-        throw new UnsupportedOperationException("not implemented");
+        try {
+            this.svcSkeleton.start();
+            this.regSkeleton.start();
+        } catch (Exception e) {
+            throw new RMIException(e);
+        }
     }
 
     /** Stops the naming server.
@@ -70,7 +79,10 @@ public class NamingServer implements Service, Registration
      */
     public void stop()
     {
-        throw new UnsupportedOperationException("not implemented");
+        svcSkeleton.stop();
+        regSkeleton.stop();
+        // TODO: below stopped() has to be called only after both svcSkeleton and regSkeleton have been stopped.
+        this.stopped(null);
     }
 
     /** Indicates that the server has completely shut down.
