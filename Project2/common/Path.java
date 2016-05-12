@@ -165,7 +165,7 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
            throw new IllegalArgumentException("Can't find parent of root directory");
         int lastSlashIndex = this.pathString.lastIndexOf("/");
         if(lastSlashIndex == 0)
-          return new Path("/"); 
+          return new Path("/");
         else
           return new Path(this.pathString.substring(0, this.pathString.lastIndexOf("/")));
     }
