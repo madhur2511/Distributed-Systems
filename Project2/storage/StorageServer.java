@@ -1,6 +1,7 @@
 package storage;
 
 import java.io.*;
+import java.util.*;
 import java.net.*;
 
 import common.*;
@@ -32,6 +33,10 @@ public class StorageServer implements Storage, Command
             super(Storage.class, s, addr);
         }
 
+        public StorageSkeleton(Storage s) {
+            super(Storage.class, s);
+        }
+
         @Override
         protected void stopped(Throwable e) {
             synchronized (this) {
@@ -47,6 +52,10 @@ public class StorageServer implements Storage, Command
     private class CommandSkeleton extends Skeleton<Command> {
         public CommandSkeleton(Command s, InetSocketAddress addr) {
             super(Command.class, s, addr);
+        }
+
+        public CommandSkeleton(Command s) {
+            super(Command.class, s);
         }
 
         @Override
@@ -80,13 +89,16 @@ public class StorageServer implements Storage, Command
             throw new NullPointerException("Root is null");
 
         if (client_port == 0)
-            client_port = 12000;
+            this.stoSkeleton = new StorageSkeleton(this);
+        else
+            this.stoSkeleton = new StorageSkeleton(this, new InetSocketAddress(command_port));
+
         if (command_port == 0)
-            command_port = 11000;
+            this.cmdSkeleton = new CommandSkeleton(this);
+        else
+            this.cmdSkeleton = new CommandSkeleton(this, new InetSocketAddress(client_port));
 
         this.localRoot = root;
-        this.stoSkeleton = new StorageSkeleton(this, new InetSocketAddress(client_port));
-        this.cmdSkeleton = new CommandSkeleton(this, new InetSocketAddress(command_port));
     }
 
     /** Creats a storage server, given a directory on the local filesystem.
@@ -106,8 +118,8 @@ public class StorageServer implements Storage, Command
             throw new NullPointerException("Root is null");
 
         this.localRoot = root;
-        stoSkeleton = new StorageSkeleton(this, new InetSocketAddress(12000));
-        cmdSkeleton = new CommandSkeleton(this, new InetSocketAddress(11000));
+        stoSkeleton = new StorageSkeleton(this);
+        cmdSkeleton = new CommandSkeleton(this);
 
     }
 
@@ -306,7 +318,7 @@ public class StorageServer implements Storage, Command
 
         if (temp.isDirectory()) {
             for (String s : temp.list()) {
-                if (delete(new Path(path, s)) == false)
+                if (this.delete(new Path(path, s)) == false)
                     return false;
             }
         }
@@ -322,10 +334,10 @@ public class StorageServer implements Storage, Command
         }
 
         if (server == null) {
-            throw new NullPointerException("File path is null");
+            throw new NullPointerException("Storage server is null");
         }
 
-        int len = (int)server.size(file);
+        long size = (int)server.size(file);
 
         this.delete(file);
 
@@ -333,11 +345,16 @@ public class StorageServer implements Storage, Command
             return false;
         }
 
-        // TODO int to long read
-        byte[]  data = new byte[len];
-        data = server.read(file,0,len);
+        long offset = 0;
+        int length = (int) Math.min(size, Integer.MAX_VALUE);
+        byte[] data = new byte[length];
 
-        this.write(file,0,data);
+        while (length > 0) {
+            data = server.read(file, offset, length);
+            this.write(file, offset, Arrays.copyOfRange(data, 0, length));
+            offset =+ length;
+            length = (int) Math.min((size - offset), Integer.MAX_VALUE);
+        }
 
         return true;
     }
