@@ -206,6 +206,12 @@ public class NamingServer implements Service, Registration
         return false;
     }
 
+    private Storage getRandomServer(){
+        Random rand = new Random();
+        System.out.print(rand.nextInt(this.storageStubs.size()));
+        return null;
+    }
+
     @Override
     public boolean delete(Path path) throws FileNotFoundException
     {
