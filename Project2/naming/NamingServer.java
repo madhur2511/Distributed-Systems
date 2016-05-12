@@ -180,13 +180,30 @@ public class NamingServer implements Service, Registration
     public boolean createFile(Path file)
         throws RMIException, FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(file == null)
+            throw new NullPointerException("File path cannot be null");
+        if(file.isRoot())
+            return false;
+
+        this.isDirectory(file.parent());
+        if(this.fileTree.containsKey(file.parent()))
+            throw new FileNotFoundException("Cant add directory on a file");
+
+        return false;
     }
 
     @Override
     public boolean createDirectory(Path directory) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(directory == null)
+            throw new NullPointerException("Directory path cannot be null");
+        if(directory.isRoot())
+            return false;
+
+        this.isDirectory(directory.parent());
+        if(this.fileTree.containsKey(directory.parent()))
+            throw new FileNotFoundException("Cant add directory on a file");
+        return false;
     }
 
     @Override
@@ -222,9 +239,7 @@ public class NamingServer implements Service, Registration
             else
                 updateFSTrees(path, client_stub);
         }
-
         // printFileSystem();
-
         return deletionPaths.toArray(new Path[deletionPaths.size()]);
     }
 
