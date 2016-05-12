@@ -163,7 +163,11 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
     {
         if(this.isRoot())
            throw new IllegalArgumentException("Can't find parent of root directory");
-        return new Path(this.pathString.substring(0, this.pathString.lastIndexOf("/")));
+        int lastSlashIndex = this.pathString.lastIndexOf("/");
+        if(lastSlashIndex == 0)
+          return new Path("/");
+        else
+          return new Path(this.pathString.substring(0, this.pathString.lastIndexOf("/")));
     }
 
     /** Returns the last component in the path.
