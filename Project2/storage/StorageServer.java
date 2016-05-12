@@ -166,9 +166,6 @@ public class StorageServer implements Storage, Command
                     Stub.create(Command.class, cmdSkeleton, hostname),
                     Path.list(localRoot));
             for (int i = 0; i < delFiles.length; i++) {
-                System.out.println(delFiles[i]);
-            }
-            for (int i = 0; i < delFiles.length; i++) {
                 delete(delFiles[i]);
             }
 
