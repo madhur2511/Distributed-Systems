@@ -38,7 +38,8 @@ public class NamingServer implements Service, Registration
     private volatile boolean svcStopped;
     private volatile boolean regStopped;
     private ArrayList<Storage> storageStubs;
-    private HashMap<String, ArrayList<Storage>> directoryTree = null;
+    private HashMap<Path, ArrayList<Storage>> fileTree = null;
+    private HashMap<Path, ArrayList<String>> directoryTree = null;
 
 
     // Override neccessary skeleton methods for service server.
@@ -83,7 +84,8 @@ public class NamingServer implements Service, Registration
     {
         this.svcSkeleton = new ServiceSkeleton(this);
         this.regSkeleton = new RegistrationSkeleton(this);
-        this.directoryTree = new HashMap<String, ArrayList<Storage>>();
+        this.fileTree = new HashMap<Path, ArrayList<Storage>>();
+        this.directoryTree = new HashMap<Path, ArrayList<String>>();
         this.storageStubs = new ArrayList<Storage>();
     }
 
@@ -152,13 +154,26 @@ public class NamingServer implements Service, Registration
     @Override
     public boolean isDirectory(Path path) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(path == null)
+            throw new NullPointerException("Path cannot be null");
+
+        if(!this.fileTree.containsKey(path) && !this.directoryTree.containsKey(path))
+            throw new FileNotFoundException("No such directory path exists");
+
+        return this.directoryTree.containsKey(path) ? true : false;
     }
 
     @Override
     public String[] list(Path directory) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(directory == null)
+            throw new NullPointerException("Directory path cannot be null");
+
+        if(!this.directoryTree.containsKey(directory))
+            throw new FileNotFoundException("No such directory exists");
+
+        ArrayList<String> ls = this.directoryTree.get(directory);
+        return ls.toArray(new String[ls.size()]);
     }
 
     @Override
@@ -192,31 +207,68 @@ public class NamingServer implements Service, Registration
                            Path[] files)
     {
         if (client_stub == null || command_stub == null || files == null)
-            throw new NullPointerException("Missing Stubs or files list");
-
+            throw new NullPointerException("Missing stubs or files list");
         if (storageStubs.contains(client_stub))
             throw new IllegalStateException("Duplicate storage stub");
 
         storageStubs.add(client_stub);
 
         ArrayList<Path> deletionPaths = new ArrayList<Path>();
-        for(Path path : files)
-            if(this.directoryTree.containsKey(path.toString()))
+        for(Path path : files){
+            if(path.isRoot())
+                continue;
+            if(this.fileTree.containsKey(path) || this.directoryTree.containsKey(path))
                 deletionPaths.add(path);
             else
-                updateDirectoryTree(path, client_stub);
+                updateFSTrees(path, client_stub);
+        }
+
+        // printFileSystem();
 
         return deletionPaths.toArray(new Path[deletionPaths.size()]);
     }
 
 
-    private void updateDirectoryTree(Path path, Storage client_stub){
-        Path temp = path;
+    private void updateFSTrees(Path path, Storage client_stub){
+        if (this.fileTree.get(path) == null)
+            this.fileTree.put(path, new ArrayList<Storage>());
+        this.fileTree.get(path).add(client_stub);
+        String lastPath = "";
+
+        Path temp = new Path(path.toString());
         while(!temp.isRoot()){
-            if (this.directoryTree.get(temp.toString()) == null)
-                this.directoryTree.put(temp.toString(), new ArrayList<Storage>());
-            this.directoryTree.get(temp.toString()).add(client_stub);
+            lastPath = temp.last();
             temp = temp.parent();
+
+            if (this.directoryTree.get(temp) == null)
+                this.directoryTree.put(temp, new ArrayList<String>());
+
+            ArrayList<String> currentList = this.directoryTree.get(temp);
+            if(!currentList.contains(lastPath))
+                this.directoryTree.get(temp).add(lastPath);
         }
     }
+
+    private void printFileSystem(){
+        System.out.println("******************************");
+
+        System.out.println();
+        for(Path k : this.fileTree.keySet()){
+            System.out.println(this.directoryTree.containsKey(k));
+            System.out.println(k.toString());
+        }
+
+        System.out.println();
+
+        for(Path k : this.directoryTree.keySet()){
+            System.out.println(this.directoryTree.containsKey(k));
+            System.out.println(k.toString());
+        }
+        System.out.println("******************************");
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+    }
+
 }
