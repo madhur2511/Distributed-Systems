@@ -37,6 +37,9 @@ public class NamingServer implements Service, Registration
     private RegistrationSkeleton regSkeleton;
     private volatile boolean svcStopped;
     private volatile boolean regStopped;
+    private ArrayList<Storage> storageStubs;
+    private HashMap<String, ArrayList<Storage>> directoryTree = null;
+
 
     // Override neccessary skeleton methods for service server.
     private class ServiceSkeleton extends Skeleton<Service> {
@@ -80,6 +83,8 @@ public class NamingServer implements Service, Registration
     {
         this.svcSkeleton = new ServiceSkeleton(this);
         this.regSkeleton = new RegistrationSkeleton(this);
+        this.directoryTree = new HashMap<String, ArrayList<Storage>>();
+        this.storageStubs = new ArrayList<Storage>();
     }
 
     /** Starts the naming server.
@@ -186,6 +191,30 @@ public class NamingServer implements Service, Registration
     public Path[] register(Storage client_stub, Command command_stub,
                            Path[] files)
     {
-        throw new UnsupportedOperationException("not implemented");
+        // @throws IllegalStateException If the storage server is already
+                                    //   registered.
+
+        // @throws RMIException If the call cannot be completed due to a network
+        //                      error.
+
+        if (client_stub == null || command_stub == null || files == null)
+            throw new NullPointerException("Missing Stubs or files list");
+
+        if (storageStubs.contains(client_stub))
+            throw new IllegalStateException("Duplicate storage stub");
+
+        storageStubs.add(client_stub);
+
+        ArrayList<Path> deletionPaths = new ArrayList<Path>();
+        for(Path path : files){
+            if(this.directoryTree.containsKey(path.toString()))
+                deletionPaths.add(path);
+            else
+                if (this.directoryTree.get(path.toString()) == null)
+                    this.directoryTree.put(path.toString(), new ArrayList<Storage>());
+                else
+                    this.directoryTree.get(path.toString()).add(client_stub);
+        }
+        return deletionPaths.toArray(new Path[deletionPaths.size()]);
     }
 }
