@@ -191,14 +191,11 @@ public class NamingServer implements Service, Registration
     public Path[] register(Storage client_stub, Command command_stub,
                            Path[] files)
     {
-        // @throws IllegalStateException If the storage server is already
-                                    //   registered.
-
         // @throws RMIException If the call cannot be completed due to a network
         //                      error.
 
         if (client_stub == null || command_stub == null || files == null)
-            throw new NullPointerException("Missing Stubs or files list"); 
+            throw new NullPointerException("Missing Stubs or files list");
 
         if (storageStubs.contains(client_stub))
             throw new IllegalStateException("Duplicate storage stub");
@@ -210,11 +207,46 @@ public class NamingServer implements Service, Registration
             if(this.directoryTree.containsKey(path.toString()))
                 deletionPaths.add(path);
             else
-                if (this.directoryTree.get(path.toString()) == null)
-                    this.directoryTree.put(path.toString(), new ArrayList<Storage>());
-                else
-                    this.directoryTree.get(path.toString()).add(client_stub);
+                updateDirectoryTree(path);
         }
+
+        for(String k : this.directoryTree.keySet()){
+            System.out.println(k);
+        }
+
         return deletionPaths.toArray(new Path[deletionPaths.size()]);
     }
+
+    private void updateDirectoryTree(Path path){
+        // Add path and all its ancestors to the DT
+
+        Path temp = path;
+        while(!temp.isRoot()){
+            System.out.println(temp.toString());
+            temp = temp.parent();
+        }
+
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+// else{
+//     if (this.directoryTree.get(path.toString()) == null)
+//         this.directoryTree.put(path.toString(), new ArrayList<Storage>());
+//     this.directoryTree.get(path.toString()).add(client_stub);
+//
+//     Path temp = new Path(path.toString());
+//     while(!temp.isRoot()){
+//         if (!this.directoryTree.containsKey(temp.toString()))
+//             this.directoryTree.get(temp.toString()).add(client_stub);
+//         temp = temp.parent();
+//     }
