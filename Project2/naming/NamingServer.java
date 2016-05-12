@@ -38,6 +38,7 @@ public class NamingServer implements Service, Registration
     private volatile boolean svcStopped;
     private volatile boolean regStopped;
     private ArrayList<Storage> storageStubs;
+    private ArrayList<Command> commandStubs;
     private HashMap<Path, ArrayList<Storage>> fileTree = null;
     private HashMap<Path, ArrayList<String>> directoryTree = null;
 
@@ -87,6 +88,7 @@ public class NamingServer implements Service, Registration
         this.fileTree = new HashMap<Path, ArrayList<Storage>>();
         this.directoryTree = new HashMap<Path, ArrayList<String>>();
         this.storageStubs = new ArrayList<Storage>();
+        this.commandStubs = new ArrayList<Command>();
     }
 
     /** Starts the naming server.
@@ -184,12 +186,30 @@ public class NamingServer implements Service, Registration
             throw new NullPointerException("File path cannot be null");
         if(file.isRoot())
             return false;
-
         this.isDirectory(file.parent());
         if(this.fileTree.containsKey(file.parent()))
             throw new FileNotFoundException("Cant add directory on a file");
 
-        return false;
+        if(this.directoryTree.containsKey(file) || this.fileTree.containsKey(file))
+            return false;
+
+        this.fileTree.put(file, new ArrayList<Storage>());
+        int randIndex = chooseRandomIndex(this.storageStubs);
+        if(commandStubs.get(randIndex).create(file))
+            this.fileTree.get(file).add(storageStubs.get(randIndex));
+        else{
+            if(this.fileTree.get(file) != null)
+                this.fileTree.remove(file);
+            return false;
+        }
+        return true;
+    }
+
+    private int chooseRandomIndex(ArrayList<Storage> list) throws IllegalStateException{
+        Random rand = new Random();
+        if(list.isEmpty())
+            throw new IllegalStateException("No storage servers registered with naming server");
+        return rand.nextInt(list.size());
     }
 
     @Override
@@ -199,11 +219,15 @@ public class NamingServer implements Service, Registration
             throw new NullPointerException("Directory path cannot be null");
         if(directory.isRoot())
             return false;
-
         this.isDirectory(directory.parent());
         if(this.fileTree.containsKey(directory.parent()))
             throw new FileNotFoundException("Cant add directory on a file");
-        return false;
+
+        if(this.directoryTree.containsKey(directory) || this.fileTree.containsKey(directory))
+            return false;
+        else
+            this.directoryTree.put(directory, new ArrayList<String>());
+        return true;
     }
 
     @Override
@@ -215,7 +239,12 @@ public class NamingServer implements Service, Registration
     @Override
     public Storage getStorage(Path file) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(file == null)
+            throw new NullPointerException("file path cannot be null");
+        if(!this.fileTree.containsKey(file))
+            throw new FileNotFoundException("No such file exists");
+        int randIndex = chooseRandomIndex(this.fileTree.get(file));
+        return this.fileTree.get(file).get(randIndex);
     }
 
     // The method register is documented in Registration.java.
@@ -229,6 +258,7 @@ public class NamingServer implements Service, Registration
             throw new IllegalStateException("Duplicate storage stub");
 
         storageStubs.add(client_stub);
+        commandStubs.add(command_stub);
 
         ArrayList<Path> deletionPaths = new ArrayList<Path>();
         for(Path path : files){
