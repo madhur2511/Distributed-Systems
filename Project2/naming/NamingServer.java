@@ -198,7 +198,7 @@ public class NamingServer implements Service, Registration
         //                      error.
 
         if (client_stub == null || command_stub == null || files == null)
-            throw new NullPointerException("Missing Stubs or files list");
+            throw new NullPointerException("Missing Stubs or files list"); 
 
         if (storageStubs.contains(client_stub))
             throw new IllegalStateException("Duplicate storage stub");
