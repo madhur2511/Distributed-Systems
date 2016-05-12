@@ -318,6 +318,28 @@ public class StorageServer implements Storage, Command
     public synchronized boolean copy(Path file, Storage server)
         throws RMIException, FileNotFoundException, IOException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if (file == null) {
+            throw new NullPointerException("File path is null");
+        }
+
+        if (server == null) {
+            throw new NullPointerException("File path is null");
+        }
+
+        int len = (int)server.size(file);
+
+        this.delete(file);
+
+        if (!this.create(file)) {
+            return false;
+        }
+
+        // TODO int to long read
+        byte[]  data = new byte[len];
+        data = server.read(file,0,len);
+
+        this.write(file,0,data);
+
+        return true;
     }
 }
