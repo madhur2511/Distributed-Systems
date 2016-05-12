@@ -58,7 +58,7 @@ all-classes :
 test : all-classes
 	java -cp $(UNITCLASSPATH):reference-rmi.jar unit.UnitTests
 	@echo
-	java -cp .$(CPSEPARATOR)reference-rmi.jar conformance.ConformanceTests
+	java -cp ".$(CPSEPARATOR)reference-rmi.jar" conformance.ConformanceTests
 
 # Delete all intermediate and final output and leave only the source.
 .PHONY : clean
