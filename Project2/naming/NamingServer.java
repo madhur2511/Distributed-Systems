@@ -144,13 +144,19 @@ public class NamingServer implements Service, Registration
     @Override
     public void lock(Path path, boolean exclusive) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        if(path == null)
+            throw new NullPointerException("Path cannot be null");
+        if(!this.fileTree.containsKey(path))
+            throw new FileNotFoundException("File doesn't exist!");
     }
 
     @Override
     public void unlock(Path path, boolean exclusive)
     {
-        throw new UnsupportedOperationException("not implemented");
+      if(path == null)
+          throw new NullPointerException("Path cannot be null");
+      if(!this.fileTree.containsKey(path))
+          throw new IllegalArgumentException("File doesn't exist!");
     }
 
     @Override
