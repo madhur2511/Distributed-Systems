@@ -67,4 +67,21 @@ public class DfsObject {
         this.ls.add(file);
     }
 
+    public void print(){
+        System.out.println("\n***** File Type *****");
+        System.out.println(this.ftype);
+
+        System.out.println("\n***** Lock Type *****");
+        System.out.println(this.ltype);
+
+        System.out.println("\n***** Directory -> Files *****");
+        for(String file : ls)
+            System.out.println(file);
+
+        System.out.println("\n***** File -> Storage servers *****");
+        for(Storage server : servers)
+            System.out.println(server);
+
+        System.out.println("\n");
+    }
 }

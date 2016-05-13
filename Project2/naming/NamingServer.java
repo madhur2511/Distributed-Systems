@@ -44,7 +44,6 @@ public class NamingServer implements Service, Registration
     private HashMap<Path, DfsObject> dfsTree = null;
 
 
-
     // Override neccessary skeleton methods for service server.
     private class ServiceSkeleton extends Skeleton<Service> {
         public ServiceSkeleton(Service s) {
@@ -173,19 +172,10 @@ public class NamingServer implements Service, Registration
     @Override
     public void lock(Path path, boolean exclusive) throws FileNotFoundException
     {
-        synchronized(dfsTree){
-            System.out.println("sdjbewljbclwebl");
-            if(path == null)
-                throw new NullPointerException("Path cannot be null");
-
-            if (!dfsTree.containsKey(path))
-                throw new FileNotFoundException("File or directory doesn't exist!");
-
-            Ltype lockType = exclusive ? Ltype.EXCLUSIVE_LOCK : Ltype.SHARED_LOCK;
-            if (canLock(path, lockType)) {
-                setLockTypeRecursively(path, lockType);
-            }
-        }
+        if(path == null)
+            throw new NullPointerException("Path cannot be null");
+        if (!dfsTree.containsKey(path))
+            throw new FileNotFoundException("File or directory doesn't exist!");
     }
 
     @Override
@@ -360,10 +350,8 @@ public class NamingServer implements Service, Registration
                         }
                     }
                 }
-
                 if (deletionPaths.contains(path))
                     continue;
-
                 updateFSTrees(path, client_stub);
             }
             return deletionPaths.toArray(new Path[deletionPaths.size()]);
@@ -409,20 +397,12 @@ public class NamingServer implements Service, Registration
     }
 
     private void printFileSystem(){
-        System.out.println("******************************");
-
-        System.out.println("********* File Tree **********");
-
         synchronized(dfsTree){
             for(Path k : dfsTree.keySet()){
-                System.out.println("FILEPATH   :"+k.toString());
-                System.out.println("FILEOBJECT :"+dfsTree.get(k));
+                System.out.println("\n***** File Path *****");
+                System.out.println(k.toString());
+                dfsTree.get(k).print();
             }
         }
-
-        System.out.println("******************************");
-        System.out.println();
-        System.out.println();
-        System.out.println();
     }
 }
