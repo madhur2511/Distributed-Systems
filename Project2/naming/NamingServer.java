@@ -229,6 +229,7 @@ public class NamingServer implements Service, Registration
             if(!dfsTree.containsKey(directory) || (dfsTree.get(directory).isFile()))
                 throw new FileNotFoundException("No such directory exists");
 
+            // TODO: Take share_lock on directory before getting listing.
             return dfsTree.get(directory).getList();
         }
     }
@@ -300,7 +301,30 @@ public class NamingServer implements Service, Registration
     @Override
     public boolean delete(Path path) throws FileNotFoundException
     {
-        throw new UnsupportedOperationException("not implemented");
+        synchronized (dfsTree) {
+            if (path == null)
+                throw new NullPointerException("Path cannot be null");
+
+            if (path.isRoot()) {
+                return false;
+            }
+
+            if (!dfsTree.containsKey(path))
+                throw new FileNotFoundException("No such file exists");
+
+            DfsObject obj = dfsTree.get(path);
+            // TODO: Do we need to lock this object for exclusive access??
+
+            if (obj.isFile()) {
+                ArrayList<Storage> servers = obj.getStorage();
+                for (Storage server : servers) {
+                    // TODO: get corresponding command servers and issue delete() to each
+                    // Move to helper.
+                }
+            }
+            return true;
+        }
+
     }
 
     @Override
@@ -397,7 +421,10 @@ public class NamingServer implements Service, Registration
                     // XXX: We should never land up here
                     System.out.println("something fishy going on here!!");
                 }
+
+                // TODO: share lock the directory before reading its listings.
                 if (!obj.containsFile(lastPath))
+                    // TODO: Take write_lock on directory before modifying its listing.
                     obj.addFile(lastPath);
             }
         }
