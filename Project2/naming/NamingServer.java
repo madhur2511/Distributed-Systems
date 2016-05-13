@@ -33,19 +33,89 @@ import java.util.concurrent.*;
  */
 public class NamingServer implements Service, Registration
 {
-    private final int NOT_LOCKED = 0;
-    private final int SHARED_LOCK = 1;
-    private final int EXCLUSIVE_LOCK = 2;
+    private enum Ftype {
+        FILE,
+        DIRECTORY
+    }
+
+    private enum Ltype {
+        NOT_LOCKED,
+        SHARED_LOCK,
+        EXCLUSIVE_LOCK
+    }
+
     private ServiceSkeleton svcSkeleton;
     private RegistrationSkeleton regSkeleton;
     private volatile boolean svcStopped;
     private volatile boolean regStopped;
     private ArrayList<Storage> storageStubs;
     private ArrayList<Command> commandStubs;
-    private volatile HashMap<Path, Integer> lockTree = null;
-    private HashMap<Path, ArrayList<Storage>> fileTree = null;
-    private HashMap<Path, ArrayList<String>> directoryTree = null;
+    private volatile HashMap<Path, DfsObject> dfsTree = null;
 
+    private class DfsObject {
+        public Ftype ftype;
+        public Ltype ltype;
+        public ArrayList<Storage> servers = null;
+        public ArrayList<String> ls = null;
+
+        public DfsObject(Ftype type, Ltype ltype) {
+            this.ftype = type;
+            this.ltype = ltype;
+            if (type == Ftype.FILE)
+                this.servers = new ArrayList<Storage>();
+            else
+                this.ls = new ArrayList<String>();
+        }
+
+        public Ftype getType() {
+            return this.ftype;
+        }
+
+        public boolean isFile() {
+            return this.ftype == Ftype.FILE ? true : false;
+        }
+
+        public boolean isNotLocked() {
+            return this.ltype == Ltype.NOT_LOCKED ? true : false;
+        }
+
+        public boolean isShareLocked() {
+            return this.ltype == Ltype.SHARED_LOCK ? true : false;
+        }
+
+        public boolean isExclLocked() {
+            return this.ltype == Ltype.EXCLUSIVE_LOCK ? true : false;
+        }
+
+        public void setLock(Ltype lockType) {
+            this.ltype = lockType;
+        }
+
+        public boolean isDirectory() {
+            return this.ftype == Ftype.DIRECTORY ? true : false;
+        }
+
+        public ArrayList<Storage> getStorage() {
+            return this.servers;
+        }
+
+        public void addServer(Storage server) {
+            this.servers.add(server);
+        }
+
+        public String[] getList() {
+            return this.ls.toArray(new String[ls.size()]);
+        }
+
+        public boolean containsFile(String file) {
+            return this.ls.contains(file) ? true : false;
+        }
+
+        public void addFile(String file) {
+            this.ls.add(file);
+        }
+
+    }
 
     // Override neccessary skeleton methods for service server.
     private class ServiceSkeleton extends Skeleton<Service> {
@@ -88,12 +158,13 @@ public class NamingServer implements Service, Registration
     public NamingServer()
     {
         this.svcSkeleton = new ServiceSkeleton(this);
-        this.lockTree = new HashMap<Path, Integer>();
         this.storageStubs = new ArrayList<Storage>();
         this.commandStubs = new ArrayList<Command>();
         this.regSkeleton = new RegistrationSkeleton(this);
-        this.fileTree = new HashMap<Path, ArrayList<Storage>>();
-        this.directoryTree = new HashMap<Path, ArrayList<String>>();
+
+        this.dfsTree = new HashMap<Path, DfsObject>();
+        DfsObject root = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
+        this.dfsTree.put(new Path("/"), root);
     }
 
     /** Starts the naming server.
@@ -145,23 +216,28 @@ public class NamingServer implements Service, Registration
     {
     }
 
-    private boolean canLock(Path path, int lockType){
-        Path temp = new Path(path.toString());
-        while(!temp.isRoot()){
-            if((lockType == this.SHARED_LOCK && this.lockTree.get(temp).equals(this.SHARED_LOCK))
-            || this.lockTree.get(temp).equals(this.NOT_LOCKED))
-                temp = temp.parent();
-            else
-                return false;
+    private boolean canLock(Path path, Ltype lockType){
+        synchronized(dfsTree){
+            Path temp = new Path(path.toString());
+            while(!temp.isRoot()){
+                if((lockType == Ltype.SHARED_LOCK &&
+                    dfsTree.get(temp).isShareLocked())
+                    || dfsTree.get(temp).isNotLocked())
+                    temp = temp.parent();
+                    else
+                    return false;
+                }
+                return true;
         }
-        return true;
     }
 
-    private void setLockTypeRecursively(Path path, int lockType){
-        Path temp = new Path(path.toString());
-        while(!temp.isRoot()){
-            this.lockTree.put(temp, new Integer(lockType));
-            temp = temp.parent();
+    private void setLockTypeRecursively(Path path, Ltype lockType){
+        synchronized(dfsTree){
+            Path temp = new Path(path.toString());
+            while(!temp.isRoot()){
+                dfsTree.get(temp).setLock(lockType);
+                temp = temp.parent();
+            }
         }
     }
 
@@ -169,15 +245,16 @@ public class NamingServer implements Service, Registration
     @Override
     public void lock(Path path, boolean exclusive) throws FileNotFoundException
     {
-        synchronized(this.lockTree){
+        synchronized(dfsTree){
             System.out.println("sdjbewljbclwebl");
             if(path == null)
                 throw new NullPointerException("Path cannot be null");
-            if(!this.fileTree.containsKey(path) && !this.directoryTree.containsKey(path))
-                throw new FileNotFoundException("File doesn't exist!");
 
-            int lockType = exclusive ? this.EXCLUSIVE_LOCK : this.SHARED_LOCK;
-            if(canLock(path, lockType)){
+            if (!dfsTree.containsKey(path))
+                throw new FileNotFoundException("File or directory doesn't exist!");
+
+            Ltype lockType = exclusive ? Ltype.EXCLUSIVE_LOCK : Ltype.SHARED_LOCK;
+            if (canLock(path, lockType)) {
                 setLockTypeRecursively(path, lockType);
             }
         }
@@ -186,70 +263,77 @@ public class NamingServer implements Service, Registration
     @Override
     public void unlock(Path path, boolean exclusive)
     {
-        synchronized(this){
+        synchronized(dfsTree){
             if(path == null)
                 throw new NullPointerException("Path cannot be null");
-             if(!this.fileTree.containsKey(path) && !this.directoryTree.containsKey(path))
-                throw new IllegalArgumentException("File doesn't exist!");
 
-             setLockTypeRecursively(path, this.NOT_LOCKED);
-         }
+            if (!dfsTree.containsKey(path))
+                throw new IllegalArgumentException("File or directory doesn't exist!");
+
+            setLockTypeRecursively(path, Ltype.NOT_LOCKED);
+        }
     }
 
     @Override
     public boolean isDirectory(Path path) throws FileNotFoundException
     {
-        if(path == null)
-            throw new NullPointerException("Path cannot be null");
+        synchronized(dfsTree){
+            if(path == null)
+                throw new NullPointerException("Path cannot be null");
 
-        if(!this.fileTree.containsKey(path) && !this.directoryTree.containsKey(path))
-            throw new FileNotFoundException("No such directory path exists");
+                if (!dfsTree.containsKey(path))
+                throw new FileNotFoundException("File or directory doesn't exist!");
 
-        return this.directoryTree.containsKey(path) ? true : false;
+                return dfsTree.get(path).isDirectory();
+        }
     }
 
     @Override
     public String[] list(Path directory) throws FileNotFoundException
     {
-        if(directory == null)
-            throw new NullPointerException("Directory path cannot be null");
+        synchronized(dfsTree){
+            if(directory == null)
+                throw new NullPointerException("Directory path cannot be null");
 
-        if(!this.directoryTree.containsKey(directory))
-            throw new FileNotFoundException("No such directory exists");
+            if(!dfsTree.containsKey(directory) || (dfsTree.get(directory).isFile()))
+                throw new FileNotFoundException("No such directory exists");
 
-        ArrayList<String> ls = this.directoryTree.get(directory);
-        return ls.toArray(new String[ls.size()]);
+            return dfsTree.get(directory).getList();
+        }
     }
 
     @Override
     public boolean createFile(Path file)
         throws RMIException, FileNotFoundException
     {
-        if(file == null)
-            throw new NullPointerException("File path cannot be null");
-        if(file.isRoot())
-            return false;
-        this.isDirectory(file.parent());
-        if(this.fileTree.containsKey(file.parent()))
-            throw new FileNotFoundException("Cant add directory on a file");
+        synchronized(dfsTree){
+            if(file == null)
+                throw new NullPointerException("File path cannot be null");
+            if(file.isRoot())
+                return false;
 
-        if(this.directoryTree.containsKey(file) || this.fileTree.containsKey(file))
-            return false;
+            if (!this.isDirectory(file.parent())) {
+                throw new FileNotFoundException("Parent is not a directory");
+            }
 
-        this.fileTree.put(file, new ArrayList<Storage>());
-        int randIndex = chooseRandomIndex(this.storageStubs);
-        if(commandStubs.get(randIndex).create(file))
-            this.fileTree.get(file).add(storageStubs.get(randIndex));
-        else{
-            if(this.fileTree.get(file) != null)
-                this.fileTree.remove(file);
-            return false;
+            if (dfsTree.containsKey(file)) {
+                return false;
+            } else {
+                DfsObject obj = new DfsObject(Ftype.FILE, Ltype.NOT_LOCKED);
+
+                int randIndex = chooseRandomIndex(this.storageStubs);
+                if(commandStubs.get(randIndex).create(file)) {
+                    obj.addServer(storageStubs.get(randIndex));
+                } else {
+                    return false;
+                }
+                dfsTree.put(file, obj);
+            }
+            return true;
         }
-        this.lockTree.put(file, new Integer(this.NOT_LOCKED));
-        return true;
     }
 
-    private int chooseRandomIndex(ArrayList<Storage> list) throws IllegalStateException{
+    public int chooseRandomIndex(ArrayList<Storage> list) throws IllegalStateException{
         Random rand = new Random();
         if(list.isEmpty())
             throw new IllegalStateException("No storage servers registered with naming server");
@@ -259,21 +343,26 @@ public class NamingServer implements Service, Registration
     @Override
     public boolean createDirectory(Path directory) throws FileNotFoundException
     {
-        if(directory == null)
-            throw new NullPointerException("Directory path cannot be null");
-        if(directory.isRoot())
-            return false;
-        this.isDirectory(directory.parent());
-        if(this.fileTree.containsKey(directory.parent()))
-            throw new FileNotFoundException("Cant add directory on a file");
+        synchronized(dfsTree){
+            if(directory == null)
+                throw new NullPointerException("Directory path cannot be null");
 
-        if(this.directoryTree.containsKey(directory) || this.fileTree.containsKey(directory))
-            return false;
-        else
-            this.directoryTree.put(directory, new ArrayList<String>());
+            if(directory.isRoot())
+                return false;
 
-        this.lockTree.put(directory, new Integer(this.NOT_LOCKED));
-        return true;
+            if (!this.isDirectory(directory.parent())) {
+                throw new FileNotFoundException("Parent is not a directory");
+            }
+
+            if (dfsTree.containsKey(directory)) {
+                return false;
+            } else {
+                DfsObject obj = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
+                dfsTree.put(directory, obj);
+            }
+
+            return true;
+        }
     }
 
     @Override
@@ -285,12 +374,21 @@ public class NamingServer implements Service, Registration
     @Override
     public Storage getStorage(Path file) throws FileNotFoundException
     {
-        if(file == null)
-            throw new NullPointerException("file path cannot be null");
-        if(!this.fileTree.containsKey(file))
-            throw new FileNotFoundException("No such file exists");
-        int randIndex = chooseRandomIndex(this.fileTree.get(file));
-        return this.fileTree.get(file).get(randIndex);
+        synchronized(dfsTree){
+            if(file == null)
+                throw new NullPointerException("file path cannot be null");
+
+            if(!dfsTree.containsKey(file))
+                throw new FileNotFoundException("No such file exists");
+
+            DfsObject obj = dfsTree.get(file);
+            if (obj.isDirectory())
+                throw new FileNotFoundException("Directort with same name exists");
+
+            ArrayList<Storage> servers = obj.getStorage();
+            int randIndex = this.chooseRandomIndex(servers);
+            return servers.get(randIndex);
+        }
     }
 
     // The method register is documented in Registration.java.
@@ -298,46 +396,87 @@ public class NamingServer implements Service, Registration
     public Path[] register(Storage client_stub, Command command_stub,
                            Path[] files)
     {
-        if (client_stub == null || command_stub == null || files == null)
-            throw new NullPointerException("Missing stubs or files list");
-        if (storageStubs.contains(client_stub))
-            throw new IllegalStateException("Duplicate storage stub");
+        synchronized(dfsTree){
+            if (client_stub == null || command_stub == null || files == null)
+                throw new NullPointerException("Missing stubs or files list");
+            if (storageStubs.contains(client_stub))
+                throw new IllegalStateException("Duplicate storage stub");
 
-        storageStubs.add(client_stub);
-        commandStubs.add(command_stub);
+            storageStubs.add(client_stub);
+            commandStubs.add(command_stub);
 
-        ArrayList<Path> deletionPaths = new ArrayList<Path>();
-        for(Path path : files){
-            if(path.isRoot())
-                continue;
-            if(this.fileTree.containsKey(path) || this.directoryTree.containsKey(path))
-                deletionPaths.add(path);
-            else
+            ArrayList<Path> deletionPaths = new ArrayList<Path>();
+            DfsObject obj = null;
+            String lastPath = "";
+            Path temp  = null;
+
+            for(Path path : files){
+                if(path.isRoot())
+                    continue;
+
+                // first check if the file can be added successfully.
+                if (dfsTree.containsKey(path)) {
+                    deletionPaths.add(path);
+                } else {
+                    // check if one of the parent exists as a file
+                    obj = null;
+                    lastPath = "";
+                    temp = new Path(path.toString());
+                    while(!temp.isRoot()){
+                        lastPath = temp.last();
+                        temp = temp.parent();
+                        obj = dfsTree.get(temp);
+
+                        if (obj != null && obj.isFile()) {
+                            deletionPaths.add(path);
+                        }
+                    }
+                }
+
+                if (deletionPaths.contains(path))
+                    continue;
+
                 updateFSTrees(path, client_stub);
+            }
+            return deletionPaths.toArray(new Path[deletionPaths.size()]);
         }
-        return deletionPaths.toArray(new Path[deletionPaths.size()]);
     }
 
-
     private void updateFSTrees(Path path, Storage client_stub){
-        if (this.fileTree.get(path) == null)
-            this.fileTree.put(path, new ArrayList<Storage>());
-        this.fileTree.get(path).add(client_stub);
-        this.lockTree.put(path, new Integer(this.NOT_LOCKED));
-        String lastPath = "";
+        synchronized(dfsTree){
+            DfsObject obj = dfsTree.get(path);
 
-        Path temp = new Path(path.toString());
-        while(!temp.isRoot()){
-            lastPath = temp.last();
-            temp = temp.parent();
+            if (obj == null) {
+                obj = new DfsObject(Ftype.FILE, Ltype.NOT_LOCKED);
+                dfsTree.put(path, obj);
+                obj.addServer(client_stub);
+            } else {
+                // XXX: We should never land up here
+                System.out.println("something fishy going on here!!");
+            }
 
-            this.lockTree.put(temp, new Integer(this.NOT_LOCKED));
-            if (this.directoryTree.get(temp) == null)
-                this.directoryTree.put(temp, new ArrayList<String>());
+            String lastPath = "";
+            Path temp = new Path(path.toString());
+            obj = null;
 
-            ArrayList<String> currentList = this.directoryTree.get(temp);
-            if(!currentList.contains(lastPath))
-                this.directoryTree.get(temp).add(lastPath);
+            temp = new Path(path.toString());
+            while(!temp.isRoot()){
+                lastPath = temp.last();
+                temp = temp.parent();
+                obj = dfsTree.get(temp);
+
+                if (obj == null) {
+                    obj = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
+                    dfsTree.put(temp, obj);
+                } else if (obj.isFile()) {
+                    // XXX: We should never land up here
+                    System.out.println("something fishy going on here!!");
+                }
+
+                if (!obj.containsFile(lastPath)) {
+                    obj.addFile(lastPath);
+                }
+            }
         }
     }
 
@@ -346,29 +485,16 @@ public class NamingServer implements Service, Registration
 
         System.out.println("********* File Tree **********");
 
-        for(Path k : this.fileTree.keySet()){
-            System.out.println(this.directoryTree.containsKey(k));
-            System.out.println(k.toString());
+        synchronized(dfsTree){
+            for(Path k : dfsTree.keySet()){
+                System.out.println("FILEPATH   :"+k.toString());
+                System.out.println("FILEOBJECT :"+dfsTree.get(k));
+            }
         }
 
-        System.out.println("********* Directory Tree **********");
-
-        for(Path k : this.directoryTree.keySet()){
-            System.out.println(this.directoryTree.containsKey(k));
-            System.out.println(k.toString());
-        }
-
-        System.out.println("********* Lock Tree **********");
-
-        for(Path k : this.lockTree.keySet()){
-            System.out.println(k.toString());
-            System.out.println(this.lockTree.get(k));
-        }
         System.out.println("******************************");
-
         System.out.println();
         System.out.println();
         System.out.println();
     }
-
 }
