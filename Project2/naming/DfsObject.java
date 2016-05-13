@@ -58,7 +58,7 @@ public class DfsObject {
         return this.servers;
     }
 
-    public ArrayList<Storage> getCommand() {
+    public ArrayList<Command> getCommand() {
         return this.commands;
     }
 

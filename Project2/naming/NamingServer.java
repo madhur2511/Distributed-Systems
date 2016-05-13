@@ -179,15 +179,11 @@ public class NamingServer implements Service, Registration
     public void replicate(Path path){
         ArrayList<Storage> fileServers = dfsTree.get(path).getStorage();
         ArrayList<Storage> allServers = new ArrayList<Storage>(storageStubs);
-        getDiffServers(fileServers, allServers);
+
         if(!allServers.isEmpty()){
             // int randIndex = new Random().nextInt(allServers.size());
             // allServers[randIndex];
         }
-    }
-
-    private ArrayList<int> getDiffServers(ArrayList<Storage> fileServers, ArrayList<Storage> allServers){
-
     }
 
     @Override
