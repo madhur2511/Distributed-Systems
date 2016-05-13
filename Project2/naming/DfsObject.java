@@ -5,13 +5,13 @@ import java.net.*;
 import java.util.*;
 
 public class DfsObject {
-    public Ftype ftype;
-    public Ltype ltype;
+    private Ftype ftype;
+    private Ltype ltype;
     private int currentReaders = 0;
     private int currentWriters = 0;
     private int writersPending = 0;
-    public ArrayList<Storage> servers = null;
-    public ArrayList<String> ls = null;
+    private ArrayList<String> ls = null;
+    private ArrayList<Storage> servers = null;
 
     public DfsObject(Ftype type, Ltype ltype) {
         this.ftype = type;
