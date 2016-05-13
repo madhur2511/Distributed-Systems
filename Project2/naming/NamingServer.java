@@ -143,21 +143,6 @@ public class NamingServer implements Service, Registration
     {
     }
 
-    private boolean canLock(Path path, Ltype lockType){
-        synchronized(dfsTree){
-            Path temp = new Path(path.toString());
-            while(!temp.isRoot()){
-                if((lockType == Ltype.SHARED_LOCK
-                    && dfsTree.get(temp).isShareLocked())
-                    || dfsTree.get(temp).isNotLocked())
-                    temp = temp.parent();
-                else
-                    return false;
-                }
-                return true;
-        }
-    }
-
     private void setLockTypeRecursively(Path path, Ltype lockType) throws InterruptedException{
         Path temp = new Path(path.toString());
         if(!temp.isRoot())
@@ -191,24 +176,19 @@ public class NamingServer implements Service, Registration
     @Override
     public void unlock(Path path, boolean exclusive)
     {
-        synchronized(dfsTree){
-            if(path == null)
-                throw new NullPointerException("Path cannot be null");
-
-            if (!dfsTree.containsKey(path))
-                throw new IllegalArgumentException("File or directory doesn't exist!");
-
-            try{
-                if(!exclusive)
-                    dfsTree.get(path).releaseReadLock();
-                else
-                    dfsTree.get(path).releaseWriteLock();
-
-                if(!path.isRoot())
-                    setLockTypeRecursively(path.parent(), Ltype.NOT_LOCKED);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
+        if(path == null)
+            throw new NullPointerException("Path cannot be null");
+        if (!dfsTree.containsKey(path))
+            throw new IllegalArgumentException("File or directory doesn't exist!");
+        try{
+            if(!exclusive)
+                dfsTree.get(path).releaseReadLock();
+            else
+                dfsTree.get(path).releaseWriteLock();
+            if(!path.isRoot())
+                setLockTypeRecursively(path.parent(), Ltype.NOT_LOCKED);
+        }catch(InterruptedException e){
+            e.printStackTrace();
         }
     }
 

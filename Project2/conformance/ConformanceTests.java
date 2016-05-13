@@ -53,8 +53,8 @@ public class ConformanceTests
                          conformance.naming.CreationTest.class,
                          conformance.naming.StubRetrievalTest.class,
                          conformance.naming.LockTest.class,
-                         //conformance.naming.QueueTest.class,
-                         //conformance.naming.ReplicationTest.class,
+                         conformance.naming.QueueTest.class,
+                         conformance.naming.ReplicationTest.class,
                          //conformance.naming.DeletionTest.class
                          };
         Series                      series = new Series(tests);

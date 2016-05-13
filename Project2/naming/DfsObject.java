@@ -95,9 +95,7 @@ public class DfsObject {
         System.out.println("\n");
     }
 
-
     // LOCKING MECHANISM
-
 
     public synchronized void requestReadLock() throws InterruptedException {
         while (!canAllowRead())
