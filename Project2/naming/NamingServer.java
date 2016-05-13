@@ -158,14 +158,14 @@ public class NamingServer implements Service, Registration
         }
     }
 
-    private void setLockTypeRecursively(Path path, Ltype lockType){
-        synchronized(dfsTree){
-            Path temp = new Path(path.toString());
-            while(!temp.isRoot()){
-                dfsTree.get(temp).setLock(lockType);
-                temp = temp.parent();
-            }
-        }
+    private void setLockTypeRecursively(Path path, Ltype lockType) throws InterruptedException{
+        Path temp = new Path(path.toString());
+        if(!temp.isRoot())
+            setLockTypeRecursively(path.parent(), lockType);
+        if(lockType == Ltype.NOT_LOCKED)
+            dfsTree.get(temp).releaseReadLock();
+        else
+            dfsTree.get(temp).requestReadLock();
     }
 
     // The following public methods are documented in Service.java.
@@ -174,8 +174,18 @@ public class NamingServer implements Service, Registration
     {
         if(path == null)
             throw new NullPointerException("Path cannot be null");
-        if (!dfsTree.containsKey(path))
+        if(!dfsTree.containsKey(path))
             throw new FileNotFoundException("File or directory doesn't exist!");
+        try{
+            if(!path.isRoot())
+                setLockTypeRecursively(path.parent(), Ltype.SHARED_LOCK);
+            if(!exclusive)
+                dfsTree.get(path).requestReadLock();
+            else
+                dfsTree.get(path).requestWriteLock();
+        }catch(InterruptedException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -188,7 +198,17 @@ public class NamingServer implements Service, Registration
             if (!dfsTree.containsKey(path))
                 throw new IllegalArgumentException("File or directory doesn't exist!");
 
-            setLockTypeRecursively(path, Ltype.NOT_LOCKED);
+            try{
+                if(!exclusive)
+                    dfsTree.get(path).releaseReadLock();
+                else
+                    dfsTree.get(path).releaseWriteLock();
+
+                if(!path.isRoot())
+                    setLockTypeRecursively(path.parent(), Ltype.NOT_LOCKED);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -199,10 +219,10 @@ public class NamingServer implements Service, Registration
             if(path == null)
                 throw new NullPointerException("Path cannot be null");
 
-                if (!dfsTree.containsKey(path))
+            if (!dfsTree.containsKey(path))
                 throw new FileNotFoundException("File or directory doesn't exist!");
 
-                return dfsTree.get(path).isDirectory();
+            return dfsTree.get(path).isDirectory();
         }
     }
 
@@ -325,7 +345,6 @@ public class NamingServer implements Service, Registration
 
             ArrayList<Path> deletionPaths = new ArrayList<Path>();
             DfsObject obj = null;
-            String lastPath = "";
             Path temp  = null;
 
             for(Path path : files){
@@ -338,16 +357,12 @@ public class NamingServer implements Service, Registration
                 } else {
                     // check if one of the parent exists as a file
                     obj = null;
-                    lastPath = "";
                     temp = new Path(path.toString());
                     while(!temp.isRoot()){
-                        lastPath = temp.last();
                         temp = temp.parent();
                         obj = dfsTree.get(temp);
-
-                        if (obj != null && obj.isFile()) {
+                        if (obj != null && obj.isFile())
                             deletionPaths.add(path);
-                        }
                     }
                 }
                 if (deletionPaths.contains(path))
@@ -361,7 +376,6 @@ public class NamingServer implements Service, Registration
     private void updateFSTrees(Path path, Storage client_stub){
         synchronized(dfsTree){
             DfsObject obj = dfsTree.get(path);
-
             if (obj == null) {
                 obj = new DfsObject(Ftype.FILE, Ltype.NOT_LOCKED);
                 dfsTree.put(path, obj);
@@ -388,10 +402,8 @@ public class NamingServer implements Service, Registration
                     // XXX: We should never land up here
                     System.out.println("something fishy going on here!!");
                 }
-
-                if (!obj.containsFile(lastPath)) {
+                if (!obj.containsFile(lastPath))
                     obj.addFile(lastPath);
-                }
             }
         }
     }

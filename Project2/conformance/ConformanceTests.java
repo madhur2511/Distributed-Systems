@@ -50,9 +50,9 @@ public class ConformanceTests
                          conformance.naming.ContactTest.class,
                          conformance.naming.RegistrationTest.class,
                          conformance.naming.ListingTest.class,
-                         //conformance.naming.CreationTest.class,
-                         //conformance.naming.StubRetrievalTest.class,
-                         //conformance.naming.LockTest.class,
+                         conformance.naming.CreationTest.class,
+                         conformance.naming.StubRetrievalTest.class,
+                         conformance.naming.LockTest.class,
                          //conformance.naming.QueueTest.class,
                          //conformance.naming.ReplicationTest.class,
                          //conformance.naming.DeletionTest.class

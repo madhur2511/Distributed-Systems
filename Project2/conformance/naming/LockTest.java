@@ -86,6 +86,7 @@ public class LockTest extends NamingTest
         testExclusion(root, false, root, true);
         testExclusion(root, true, root, false);
         testExclusion(root, true, root, true);
+
         testExclusion(root, true, directory, false);
         testExclusion(directory, false, root, true);
         testExclusion(directory, true, root, true);
