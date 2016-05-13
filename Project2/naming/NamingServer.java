@@ -1,12 +1,12 @@
 package naming;
 
+import rmi.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-import rmi.*;
 import common.*;
 import storage.*;
+import java.util.concurrent.*;
 
 /** Naming server.
 
@@ -33,12 +33,16 @@ import storage.*;
  */
 public class NamingServer implements Service, Registration
 {
+    private final int NOT_LOCKED = 0;
+    private final int SHARED_LOCK = 1;
+    private final int EXCLUSIVE_LOCK = 2;
     private ServiceSkeleton svcSkeleton;
     private RegistrationSkeleton regSkeleton;
     private volatile boolean svcStopped;
     private volatile boolean regStopped;
     private ArrayList<Storage> storageStubs;
     private ArrayList<Command> commandStubs;
+    private volatile HashMap<Path, Integer> lockTree = null;
     private HashMap<Path, ArrayList<Storage>> fileTree = null;
     private HashMap<Path, ArrayList<String>> directoryTree = null;
 
@@ -84,11 +88,12 @@ public class NamingServer implements Service, Registration
     public NamingServer()
     {
         this.svcSkeleton = new ServiceSkeleton(this);
+        this.lockTree = new HashMap<Path, Integer>();
+        this.storageStubs = new ArrayList<Storage>();
+        this.commandStubs = new ArrayList<Command>();
         this.regSkeleton = new RegistrationSkeleton(this);
         this.fileTree = new HashMap<Path, ArrayList<Storage>>();
         this.directoryTree = new HashMap<Path, ArrayList<String>>();
-        this.storageStubs = new ArrayList<Storage>();
-        this.commandStubs = new ArrayList<Command>();
     }
 
     /** Starts the naming server.
@@ -140,23 +145,55 @@ public class NamingServer implements Service, Registration
     {
     }
 
+    private boolean canLock(Path path, int lockType){
+        Path temp = new Path(path.toString());
+        while(!temp.isRoot()){
+            if((lockType == this.SHARED_LOCK && this.lockTree.get(temp).equals(this.SHARED_LOCK))
+            || this.lockTree.get(temp).equals(this.NOT_LOCKED))
+                temp = temp.parent();
+            else
+                return false;
+        }
+        return true;
+    }
+
+    private void setLockTypeRecursively(Path path, int lockType){
+        Path temp = new Path(path.toString());
+        while(!temp.isRoot()){
+            this.lockTree.put(temp, new Integer(lockType));
+            temp = temp.parent();
+        }
+    }
+
     // The following public methods are documented in Service.java.
     @Override
     public void lock(Path path, boolean exclusive) throws FileNotFoundException
     {
-        if(path == null)
-            throw new NullPointerException("Path cannot be null");
-        if(!this.fileTree.containsKey(path))
-            throw new FileNotFoundException("File doesn't exist!");
+        synchronized(this.lockTree){
+            System.out.println("sdjbewljbclwebl");
+            if(path == null)
+                throw new NullPointerException("Path cannot be null");
+            if(!this.fileTree.containsKey(path) && !this.directoryTree.containsKey(path))
+                throw new FileNotFoundException("File doesn't exist!");
+
+            int lockType = exclusive ? this.EXCLUSIVE_LOCK : this.SHARED_LOCK;
+            if(canLock(path, lockType)){
+                setLockTypeRecursively(path, lockType);
+            }
+        }
     }
 
     @Override
     public void unlock(Path path, boolean exclusive)
     {
-      if(path == null)
-          throw new NullPointerException("Path cannot be null");
-      if(!this.fileTree.containsKey(path))
-          throw new IllegalArgumentException("File doesn't exist!");
+        synchronized(this){
+            if(path == null)
+                throw new NullPointerException("Path cannot be null");
+             if(!this.fileTree.containsKey(path) && !this.directoryTree.containsKey(path))
+                throw new IllegalArgumentException("File doesn't exist!");
+
+             setLockTypeRecursively(path, this.NOT_LOCKED);
+         }
     }
 
     @Override
@@ -208,6 +245,7 @@ public class NamingServer implements Service, Registration
                 this.fileTree.remove(file);
             return false;
         }
+        this.lockTree.put(file, new Integer(this.NOT_LOCKED));
         return true;
     }
 
@@ -233,6 +271,8 @@ public class NamingServer implements Service, Registration
             return false;
         else
             this.directoryTree.put(directory, new ArrayList<String>());
+
+        this.lockTree.put(directory, new Integer(this.NOT_LOCKED));
         return true;
     }
 
@@ -275,7 +315,6 @@ public class NamingServer implements Service, Registration
             else
                 updateFSTrees(path, client_stub);
         }
-        // printFileSystem();
         return deletionPaths.toArray(new Path[deletionPaths.size()]);
     }
 
@@ -284,6 +323,7 @@ public class NamingServer implements Service, Registration
         if (this.fileTree.get(path) == null)
             this.fileTree.put(path, new ArrayList<Storage>());
         this.fileTree.get(path).add(client_stub);
+        this.lockTree.put(path, new Integer(this.NOT_LOCKED));
         String lastPath = "";
 
         Path temp = new Path(path.toString());
@@ -291,6 +331,7 @@ public class NamingServer implements Service, Registration
             lastPath = temp.last();
             temp = temp.parent();
 
+            this.lockTree.put(temp, new Integer(this.NOT_LOCKED));
             if (this.directoryTree.get(temp) == null)
                 this.directoryTree.put(temp, new ArrayList<String>());
 
@@ -303,17 +344,25 @@ public class NamingServer implements Service, Registration
     private void printFileSystem(){
         System.out.println("******************************");
 
-        System.out.println();
+        System.out.println("********* File Tree **********");
+
         for(Path k : this.fileTree.keySet()){
             System.out.println(this.directoryTree.containsKey(k));
             System.out.println(k.toString());
         }
 
-        System.out.println();
+        System.out.println("********* Directory Tree **********");
 
         for(Path k : this.directoryTree.keySet()){
             System.out.println(this.directoryTree.containsKey(k));
             System.out.println(k.toString());
+        }
+
+        System.out.println("********* Lock Tree **********");
+
+        for(Path k : this.lockTree.keySet()){
+            System.out.println(k.toString());
+            System.out.println(this.lockTree.get(k));
         }
         System.out.println("******************************");
 
