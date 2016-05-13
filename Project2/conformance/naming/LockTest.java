@@ -77,18 +77,18 @@ public class LockTest extends NamingTest
     @Override
     protected void perform() throws TestFailed
     {
-        // testBadPaths();
-        //
-        // testSharing(root, false, root, false);
-        // testSharing(file1, true, file2, true);
-        // testSharing(file1, true, directory, false);
+        testBadPaths();
+
+        testSharing(root, false, root, false);
+        testSharing(file1, true, file2, true);
+        testSharing(file1, true, directory, false);
 
         testExclusion(root, false, root, true);
-        // testExclusion(root, true, root, false);
-        // testExclusion(root, true, root, true);
-        // testExclusion(root, true, directory, false);
-        // testExclusion(directory, false, root, true);
-        // testExclusion(directory, true, root, true);
+        testExclusion(root, true, root, false);
+        testExclusion(root, true, root, true);
+        testExclusion(root, true, directory, false);
+        testExclusion(directory, false, root, true);
+        testExclusion(directory, true, root, true);
     }
 
     /** Checks that two threads are able to lock the two given paths
