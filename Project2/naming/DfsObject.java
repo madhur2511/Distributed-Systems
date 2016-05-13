@@ -10,14 +10,18 @@ public class DfsObject {
     private int currentReaders = 0;
     private int currentWriters = 0;
     private int writersPending = 0;
+    private int totalReadCount = 0;
     private ArrayList<String> ls = null;
     private ArrayList<Storage> servers = null;
+    private ArrayList<Command> commands = null;
 
     public DfsObject(Ftype type, Ltype ltype) {
         this.ftype = type;
         this.ltype = ltype;
-        if (type == Ftype.FILE)
+        if (type == Ftype.FILE){
             this.servers = new ArrayList<Storage>();
+            this.commands = new ArrayList<Command>();
+        }
         else
             this.ls = new ArrayList<String>();
     }
@@ -54,8 +58,16 @@ public class DfsObject {
         return this.servers;
     }
 
+    public ArrayList<Storage> getCommand() {
+        return this.commands;
+    }
+
     public void addServer(Storage server) {
         this.servers.add(server);
+    }
+
+    public void addCommand(Command command) {
+        this.commands.add(command);
     }
 
     public String[] getList() {
@@ -68,6 +80,10 @@ public class DfsObject {
 
     public void addFile(String file) {
         this.ls.add(file);
+    }
+
+    public synchronized int getTotalReadCount(){
+        return this.totalReadCount;
     }
 
     public void print(){
@@ -101,6 +117,7 @@ public class DfsObject {
         while (!canAllowRead())
             wait();
         currentReaders += 1;
+        totalReadCount += 1;
     }
 
     private boolean canAllowRead() {

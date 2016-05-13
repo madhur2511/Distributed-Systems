@@ -164,13 +164,30 @@ public class NamingServer implements Service, Registration
         try{
             if(!path.isRoot())
                 setLockTypeRecursively(path.parent(), Ltype.SHARED_LOCK);
-            if(!exclusive)
+            if(!exclusive){
                 dfsTree.get(path).requestReadLock();
+                if(dfsTree.get(path).getTotalReadCount() > 20)
+                    replicate(path);
+            }
             else
                 dfsTree.get(path).requestWriteLock();
         }catch(InterruptedException e){
             e.printStackTrace();
         }
+    }
+
+    public void replicate(Path path){
+        ArrayList<Storage> fileServers = dfsTree.get(path).getStorage();
+        ArrayList<Storage> allServers = new ArrayList<Storage>(storageStubs);
+        getDiffServers(fileServers, allServers);
+        if(!allServers.isEmpty()){
+            // int randIndex = new Random().nextInt(allServers.size());
+            // allServers[randIndex];
+        }
+    }
+
+    private ArrayList<int> getDiffServers(ArrayList<Storage> fileServers, ArrayList<Storage> allServers){
+
     }
 
     @Override
@@ -242,6 +259,7 @@ public class NamingServer implements Service, Registration
                 int randIndex = chooseRandomIndex(this.storageStubs);
                 if(commandStubs.get(randIndex).create(file)) {
                     obj.addServer(storageStubs.get(randIndex));
+                    obj.addCommand(commandStubs.get(randIndex));
                 } else {
                     return false;
                 }
@@ -347,19 +365,20 @@ public class NamingServer implements Service, Registration
                 }
                 if (deletionPaths.contains(path))
                     continue;
-                updateFSTrees(path, client_stub);
+                updateFSTrees(path, client_stub, command_stub);
             }
             return deletionPaths.toArray(new Path[deletionPaths.size()]);
         }
     }
 
-    private void updateFSTrees(Path path, Storage client_stub){
+    private void updateFSTrees(Path path, Storage client_stub, Command command_stub){
         synchronized(dfsTree){
             DfsObject obj = dfsTree.get(path);
             if (obj == null) {
                 obj = new DfsObject(Ftype.FILE, Ltype.NOT_LOCKED);
                 dfsTree.put(path, obj);
                 obj.addServer(client_stub);
+                obj.addCommand(command_stub);
             } else {
                 // XXX: We should never land up here
                 System.out.println("something fishy going on here!!");
