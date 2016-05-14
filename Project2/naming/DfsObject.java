@@ -1,10 +1,12 @@
 package naming;
 import storage.*;
+import common.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
 public class DfsObject {
+    private Path path;
     private Ftype ftype;
     private Ltype ltype;
     private int currentReaders = 0;
@@ -15,7 +17,8 @@ public class DfsObject {
     private ArrayList<Storage> servers = null;
     private ArrayList<Command> commands = null;
 
-    public DfsObject(Ftype type, Ltype ltype) {
+    public DfsObject(Path path, Ftype type, Ltype ltype) {
+        this.path = new Path(path.toString());
         this.ftype = type;
         this.ltype = ltype;
         if (type == Ftype.FILE){
@@ -24,6 +27,14 @@ public class DfsObject {
         }
         else
             this.ls = new ArrayList<String>();
+    }
+
+    public Path getPath() {
+        return this.path;
+    }
+
+    public String getLast() {
+        return this.path.last();
     }
 
     public Ftype getType() {
