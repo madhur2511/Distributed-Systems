@@ -138,6 +138,10 @@ public class DfsObject {
         }
         writersPending -= 1;
         currentWriters += 1;
+        if(ftype == Ftype.FILE){
+            this.servers.removeAll(this.servers.subList(1, this.servers.size()));
+            this.commands.removeAll(this.commands.subList(1, this.commands.size()));
+        }
     }
 
     public synchronized void releaseWriteLock() throws InterruptedException {
