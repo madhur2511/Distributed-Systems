@@ -316,7 +316,7 @@ public class NamingServer implements Service, Registration
     }
 
     @Override
-    public boolean delete(Path path) throws FileNotFoundException, RMIException
+    public boolean delete(Path path) throws RMIException, FileNotFoundException
     {
         synchronized (dfsTree) {
             if (path == null)
@@ -331,30 +331,23 @@ public class NamingServer implements Service, Registration
 
             // TODO: Do we need to lock this object for exclusive access??
 
-            if (!deleteObj(dfsTree.get(path), path))
-                return false;
+            DfsObject obj = dfsTree.get(path);
+            ArrayList<Command> commands = null;
+            if (obj.isFile())
+                commands = obj.getCommand();
+            else
+                commands = this.commandStubs;
 
+            for (Command cmd : commands) {
+                // some of the servers may not have directory and hence
+                // could return false on delete. Ignore them.
+                if (!cmd.delete(path) && !obj.isDirectory())
+                    return false;
+            }
+
+            dfsTree.remove(path);
             return true;
         }
-    }
-
-    private boolean deleteObj(DfsObject obj, Path path) throws RMIException
-    {
-        ArrayList<Command> commands = null;
-        if (obj.isFile())
-            commands = obj.getCommand();
-        else
-            commands = this.commandStubs;
-
-        for (Command cmd : commands) {
-            // some of the servers may not have directory and hence
-            // could return false on delete. Ignore them.
-            if (!cmd.delete(path) && !obj.isDirectory())
-                return false;
-        }
-
-        dfsTree.remove(path);
-        return true;
     }
 
     @Override
