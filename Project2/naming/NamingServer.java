@@ -166,7 +166,7 @@ public class NamingServer implements Service, Registration
                 setLockTypeRecursively(path.parent(), Ltype.SHARED_LOCK);
             if(!exclusive){
                 dfsTree.get(path).requestReadLock();
-                if(dfsTree.get(path).getTotalReadCount() > 20)
+                if(dfsTree.get(path).getTotalReadCount() % 20 == 0)
                     replicate(path);
             }
             else
@@ -177,12 +177,23 @@ public class NamingServer implements Service, Registration
     }
 
     public void replicate(Path path){
-        ArrayList<Storage> fileServers = dfsTree.get(path).getStorage();
-        ArrayList<Storage> allServers = new ArrayList<Storage>(storageStubs);
+        ArrayList<Command> diffCommandServers = new ArrayList<Command>(commandStubs);
+        diffCommandServers.removeAll(dfsTree.get(path).getCommand());
 
-        if(!allServers.isEmpty()){
-            // int randIndex = new Random().nextInt(allServers.size());
-            // allServers[randIndex];
+        if(!diffCommandServers.isEmpty()){
+            Command diffCommandServer = diffCommandServers.get(new Random().nextInt(diffCommandServers.size()));
+            try{
+                DfsObject dfsNode = dfsTree.get(path);
+                Storage existingStorageServer = dfsNode.getStorage().get(0);
+                Storage diffStorageServer = storageStubs.get(commandStubs.indexOf(diffCommandServer));
+
+                if(diffCommandServer.copy(path, existingStorageServer)){
+                    dfsNode.addCommand(diffCommandServer);
+                    dfsNode.addServer(diffStorageServer);
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -215,6 +226,7 @@ public class NamingServer implements Service, Registration
             if (!dfsTree.containsKey(path))
                 throw new FileNotFoundException("File or directory doesn't exist!");
 
+            // TODO: Take share_lock on directory before getting listing.
             return dfsTree.get(path).isDirectory();
         }
     }
@@ -238,6 +250,7 @@ public class NamingServer implements Service, Registration
     public boolean createFile(Path file)
         throws RMIException, FileNotFoundException
     {
+        // TODO: Take share_lock on directory before getting listing.
         synchronized(dfsTree){
             if(file == null)
                 throw new NullPointerException("File path cannot be null");
@@ -278,6 +291,7 @@ public class NamingServer implements Service, Registration
     @Override
     public boolean createDirectory(Path directory) throws FileNotFoundException
     {
+        // TODO: Take share_lock on directory before getting listing.
         synchronized(dfsTree){
             if(directory == null)
                 throw new NullPointerException("Directory path cannot be null");
