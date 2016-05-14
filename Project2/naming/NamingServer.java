@@ -274,9 +274,10 @@ public class NamingServer implements Service, Registration
                 } else {
                     return false;
                 }
-                dfsTree.put(file, obj);
 
-                // TODO: add it to parent's listing.
+                dfsTree.put(file, obj);
+                // TODO: lock the parent before adding the file to its list?
+                dfsTree.get(file.parent()).addFile(file.last());
             }
             return true;
         }
@@ -309,7 +310,8 @@ public class NamingServer implements Service, Registration
             } else {
                 DfsObject obj = new DfsObject(directory, Ftype.DIRECTORY, Ltype.NOT_LOCKED);
                 dfsTree.put(directory, obj);
-                // TODO: add it to parent's listing.
+                // TODO: lock the parent before adding the directory to its list?
+                dfsTree.get(directory.parent()).addFile(directory.last());
             }
 
             return true;
@@ -432,7 +434,6 @@ public class NamingServer implements Service, Registration
             Path temp = new Path(path.toString());
             obj = null;
 
-            temp = new Path(path.toString());
             while(!temp.isRoot()){
                 lastPath = temp.last();
                 temp = temp.parent();
@@ -446,9 +447,8 @@ public class NamingServer implements Service, Registration
                     System.out.println("something fishy going on here!!");
                 }
 
-                // TODO: share lock the directory before reading its listings.
+                // TODO: share lock/write lock the directory before reading its listings.
                 if (!obj.containsFile(lastPath))
-                    // TODO: Take write_lock on directory before modifying its listing.
                     obj.addFile(lastPath);
             }
         }
