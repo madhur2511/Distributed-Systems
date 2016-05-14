@@ -261,6 +261,8 @@ public class NamingServer implements Service, Registration
                     return false;
                 }
                 dfsTree.put(file, obj);
+
+                // TODO: add it to parent's listing.
             }
             return true;
         }
@@ -292,6 +294,7 @@ public class NamingServer implements Service, Registration
             } else {
                 DfsObject obj = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
                 dfsTree.put(directory, obj);
+                // TODO: add it to parent's listing.
             }
 
             return true;
@@ -299,7 +302,7 @@ public class NamingServer implements Service, Registration
     }
 
     @Override
-    public boolean delete(Path path) throws FileNotFoundException
+    public boolean delete(Path path) throws FileNotFoundException, RMIException
     {
         synchronized (dfsTree) {
             if (path == null)
@@ -312,19 +315,40 @@ public class NamingServer implements Service, Registration
             if (!dfsTree.containsKey(path))
                 throw new FileNotFoundException("No such file exists");
 
-            DfsObject obj = dfsTree.get(path);
             // TODO: Do we need to lock this object for exclusive access??
 
-            if (obj.isFile()) {
-                ArrayList<Storage> servers = obj.getStorage();
-                for (Storage server : servers) {
-                    // TODO: get corresponding command servers and issue delete() to each
-                    // Move to helper.
-                }
-            }
+//            if (obj.isDirectory()) {
+//                String[] ls = obj.getList();
+//                for (String file : ls) {
+//                    if (!this.delete(new Path(path, file)))
+//                        return false;
+//                }
+//            }
+
+            if (!deleteObj(dfsTree.get(path), path))
+                return false;
+
             return true;
         }
+    }
 
+    private boolean deleteObj(DfsObject obj, Path path) throws RMIException
+    {
+        ArrayList<Command> commands = null;
+        if (obj.isFile())
+            commands = obj.getCommand();
+        else
+            commands = this.commandStubs;
+
+        for (Command cmd : commands) {
+            // some of the servers may not have directory and hence
+            // could return false on delete. Ignore them.
+            if (!cmd.delete(path) && !obj.isDirectory())
+                return false;
+        }
+
+        dfsTree.remove(path);
+        return true;
     }
 
     @Override
