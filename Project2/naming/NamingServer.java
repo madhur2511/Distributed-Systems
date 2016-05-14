@@ -90,7 +90,7 @@ public class NamingServer implements Service, Registration
         this.regSkeleton = new RegistrationSkeleton(this);
 
         this.dfsTree = new HashMap<Path, DfsObject>();
-        DfsObject root = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
+        DfsObject root = new DfsObject(new Path("/"), Ftype.DIRECTORY, Ltype.NOT_LOCKED);
         this.dfsTree.put(new Path("/"), root);
     }
 
@@ -264,7 +264,7 @@ public class NamingServer implements Service, Registration
             if (dfsTree.containsKey(file)) {
                 return false;
             } else {
-                DfsObject obj = new DfsObject(Ftype.FILE, Ltype.NOT_LOCKED);
+                DfsObject obj = new DfsObject(file, Ftype.FILE, Ltype.NOT_LOCKED);
 
                 int randIndex = chooseRandomIndex(this.storageStubs);
                 if(commandStubs.get(randIndex).create(file)) {
@@ -306,7 +306,7 @@ public class NamingServer implements Service, Registration
             if (dfsTree.containsKey(directory)) {
                 return false;
             } else {
-                DfsObject obj = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
+                DfsObject obj = new DfsObject(directory, Ftype.DIRECTORY, Ltype.NOT_LOCKED);
                 dfsTree.put(directory, obj);
                 // TODO: add it to parent's listing.
             }
@@ -418,7 +418,7 @@ public class NamingServer implements Service, Registration
         synchronized(dfsTree){
             DfsObject obj = dfsTree.get(path);
             if (obj == null) {
-                obj = new DfsObject(Ftype.FILE, Ltype.NOT_LOCKED);
+                obj = new DfsObject(path, Ftype.FILE, Ltype.NOT_LOCKED);
                 dfsTree.put(path, obj);
                 obj.addServer(client_stub);
                 obj.addCommand(command_stub);
@@ -438,7 +438,7 @@ public class NamingServer implements Service, Registration
                 obj = dfsTree.get(temp);
 
                 if (obj == null) {
-                    obj = new DfsObject(Ftype.DIRECTORY, Ltype.NOT_LOCKED);
+                    obj = new DfsObject(temp, Ftype.DIRECTORY, Ltype.NOT_LOCKED);
                     dfsTree.put(temp, obj);
                 } else if (obj.isFile()) {
                     // XXX: We should never land up here
