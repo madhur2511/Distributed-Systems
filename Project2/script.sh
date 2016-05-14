@@ -1,8 +1,9 @@
-rm aa
+rm logs
+make test
 for i in $(seq 1 100);
 do
     echo $i
-    java conformance.ConformanceTests >> aa
+    java -cp ".:reference-rmi.jar" conformance.ConformanceTests >> logs
 done
 
-grep -o "passed: 18" aa | wc -l
+grep -o "passed: 18" logs | wc -l
