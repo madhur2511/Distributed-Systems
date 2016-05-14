@@ -331,14 +331,6 @@ public class NamingServer implements Service, Registration
 
             // TODO: Do we need to lock this object for exclusive access??
 
-//            if (obj.isDirectory()) {
-//                String[] ls = obj.getList();
-//                for (String file : ls) {
-//                    if (!this.delete(new Path(path, file)))
-//                        return false;
-//                }
-//            }
-
             if (!deleteObj(dfsTree.get(path), path))
                 return false;
 
