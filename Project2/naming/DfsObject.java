@@ -149,6 +149,15 @@ public class DfsObject {
         }
         writersPending -= 1;
         currentWriters += 1;
+        if(ftype == Ftype.FILE){
+            for(int i = this.servers.size() - 1; i > 0 ; i -= 1){
+                try{
+                    this.commands.get(i).delete(path);
+                }catch(Exception e){}
+                this.servers.remove(i);
+                this.commands.remove(i);
+            }
+        }
     }
 
     public synchronized void releaseWriteLock() throws InterruptedException {

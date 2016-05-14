@@ -169,8 +169,9 @@ public class NamingServer implements Service, Registration
                 if(dfsTree.get(path).getTotalReadCount() % 20 == 0)
                     replicate(path);
             }
-            else
+            else{
                 dfsTree.get(path).requestWriteLock();
+            }
         }catch(InterruptedException e){
             e.printStackTrace();
         }
