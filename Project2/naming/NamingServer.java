@@ -147,10 +147,12 @@ public class NamingServer implements Service, Registration
         Path temp = new Path(path.toString());
         if(!temp.isRoot())
             setLockTypeRecursively(path.parent(), lockType);
-        if(lockType == Ltype.NOT_LOCKED)
-            dfsTree.get(temp).releaseReadLock();
-        else
-            dfsTree.get(temp).requestReadLock();
+        try{
+            if(lockType == Ltype.NOT_LOCKED)
+                dfsTree.get(temp).releaseReadLock();
+            else
+                dfsTree.get(temp).requestReadLock();
+        }catch(Exception e){}
     }
 
     // The following public methods are documented in Service.java.
