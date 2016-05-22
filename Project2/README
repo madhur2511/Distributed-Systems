@@ -1,3 +1,46 @@
+DISTRIBUTED FILE SYSTEM
+
+Authors:
+1. Amit Borase
+   A53095391
+   aborase@ucsd.edu
+
+2. Himanshu Arora
+   A53097039
+   hiarora@ucsd.edu
+
+3. Jayant Malani
+   A53102766
+   jmalani@ucsd.edu
+
+2. Madhur Kapoor
+   A53098432
+   makapoor@ucsd.edu
+
+
+Steps to execute:
+
+To test the Distributed File System, either replace the conformance folder with
+your own version of conformance and run 'make test' from the root of the
+project, or use the existing copy of conformance.
+
+Results from our end:
+
+DFS was tested locally on Linux and Mac machines and also on Docker environment.
+
+    a. All 18/18 tests pass on local linux and Mac machine.
+
+    b. All 18/18 tests pass in the Docker environment as well.
+
+    c. Stress-tested the DFS test suite for a 100 times, on both Docker and
+       local environments, all 18/18 tests pass, all 100 times.
+
+
+
+###############################################################################
+
+
+
 MAKEFILE TARGETS
 
 To compile all Java files, execute
@@ -14,6 +57,7 @@ run
 
 To generate documentation, execute
         make docs
+
 The documentation can then be viewed at javadoc/index.html. The suggested
 reading order for the packages is rmi, then common, naming, storage, client,
 apps. Alternatively, complete documentation of all classes and members can be
@@ -31,7 +75,7 @@ Various tests can be run by executing:
         java conformance.ConformanceTests
         java -cp ./:./unit unit.UnitTests
         java test.SelfTest
-Conformance tests check the public interfaces of the classes in the various 
+Conformance tests check the public interfaces of the classes in the various
 packages for conformance to the written specifications. The tests are thorough
 but not exhaustive. Conformance tests are grouped by the packages they test. For
 example, conformance tests for the RMI library, which is in the package rmi, are
