@@ -17,6 +17,9 @@ import naming.*;
  */
 public class StorageServer implements Storage, Command
 {
+    // COPY max_chunk_size 1MB
+    private final int MAX_COPY_SIZE = 1 * 1024 * 1024;
+
     // Variable used to store root of folder mounted
     private File localRoot;
 
@@ -376,7 +379,7 @@ public class StorageServer implements Storage, Command
         }
 
         long offset = 0;
-        int length = (int) Math.min(size, Integer.MAX_VALUE);
+        int length = (int) Math.min(size, MAX_COPY_SIZE);
         byte[] data = new byte[length];
 
         // Took care of overflow
@@ -384,7 +387,7 @@ public class StorageServer implements Storage, Command
             data = server.read(file, offset, length);
             this.write(file, offset, Arrays.copyOfRange(data, 0, length));
             offset =+ length;
-            length = (int) Math.min((size - offset), Integer.MAX_VALUE);
+            length = (int) Math.min((size - offset), MAX_COPY_SIZE);
         }
 
         return true;
