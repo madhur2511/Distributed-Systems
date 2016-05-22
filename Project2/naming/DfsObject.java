@@ -5,6 +5,28 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+/**
+    This represents an INode like object of a general purpose file-system.
+    It is a one-place store for all information relevant to a file-system path,
+    be it a file or directory.
+
+    It contains-
+    1.  Path of the DFS object
+    2.  File type, file or directory  [check out Ftype.java]
+    3.  Lock type, current lock status of the DFS Object. [check out Ltype.java]
+    4.  currentReaders,the number of readers currently accessing this DFS object
+    5.  currentWriters, the number of writers currently writing this DFS object
+    6.  writersPending, the number of writers waiting to write this DFS object
+    7.  totalReadCount, the number of accesses to this object. Used for
+        replication purposes
+    8.  ls, If this object is a directory, it denotes the "ls" of this directory
+        ,else null if a file
+    9.  servers, If this object is a file, it denotes the storage servers
+        containing this file, else null if its a directory
+    10. commands, If this object is a file, it denotes the command interface
+        of the storage servers containing this file,else null if its a directory
+*/
+
 public class DfsObject {
     private Path path;
     private Ftype ftype;
@@ -121,6 +143,8 @@ public class DfsObject {
 
         System.out.println("\n");
     }
+
+
 
     // LOCKING MECHANISM
 
