@@ -143,6 +143,15 @@ public class NamingServer implements Service, Registration
     {
     }
 
+/** Description of the mechanism that helps to secure lock.
+        Called in the lock and unlock procedures.
+        1. Recursively traverse up to the root folder.
+        2. Secure lock in the order root -> file.
+        3. Release or lock depending on the lockType
+        <p>
+        @param path The path for which the lock has been requested.
+        @param lockType can be Ltype.NOT_LOCKED or Ltype.SHARED_LOCK
+     */
     private void setLockTypeRecursively(Path path, Ltype lockType) throws InterruptedException{
         Path temp = new Path(path.toString());
         if(!temp.isRoot())
@@ -155,7 +164,26 @@ public class NamingServer implements Service, Registration
         }catch(Exception e){}
     }
 
-    // The following public methods are documented in Service.java.
+/** Description of the locking mechanism.
+
+        <p>
+        On getting a lock request, our implementation tries to secure a shared
+        lock on the parents of the file for which the lock is requested.
+        The locking mechanism blocks the request if the lock cannot be granted.
+        The threads requesting the lock are put to sleep and notified once a
+        lock is released. We recursively traverse to the parent hierarchy of the
+        given file until the root. Similar to Java ReadWriteLock, we follow a
+        reader writer mechanism, on every path. Each DfsObject corresponds to
+        either a directory or a file. It maintains a count of read and write
+        requests that are waiting on this object. We also handle the
+        replication in the lock method. Since every client has to call lock
+        before a read request, we can check if the number of read requests are
+        a multiple of 20. Once we know that the read count has exceeded 20,
+        we can fire a replication request.
+        @param path The path for which the lock has been requested.
+        @param exclusive True, if exclusive lock has been requested, else false.
+     */
+
     @Override
     public void lock(Path path, boolean exclusive) throws FileNotFoundException
     {
@@ -179,6 +207,19 @@ public class NamingServer implements Service, Registration
         }
     }
 
+/** Description of the replicate mechanism.
+
+        <p>
+        This method creates a copy of an existing file in a different storage
+        server.
+        1. Get the list of all command stubs
+        2. Get the list of command stubs, corresponding to the storage servers
+           of this file
+        3. Test if the global list has more command stubs compared to the
+           stubs for this file.
+        4. Copy this file to the new storage server (selected at Random from
+           the diff in step 3).
+     */
     public void replicate(Path path){
         ArrayList<Command> diffCommandServers = new ArrayList<Command>(commandStubs);
         diffCommandServers.removeAll(dfsTree.get(path).getCommand());
@@ -200,6 +241,14 @@ public class NamingServer implements Service, Registration
         }
     }
 
+/** Description of the unlock mechanism.
+
+        <p>
+        The unlock method works like lock only. It releases the lock in the
+        order in which the locks were secured.
+        @param path The path for which the lock has been requested.
+        @param exclusive True, if exclusive lock has been requested, else false.
+     */
     @Override
     public void unlock(Path path, boolean exclusive)
     {
@@ -229,7 +278,6 @@ public class NamingServer implements Service, Registration
             if (!dfsTree.containsKey(path))
                 throw new FileNotFoundException("File or directory doesn't exist!");
 
-            // TODO: Take share_lock on directory before getting listing.
             return dfsTree.get(path).isDirectory();
         }
     }
@@ -244,7 +292,6 @@ public class NamingServer implements Service, Registration
             if(!dfsTree.containsKey(directory) || (dfsTree.get(directory).isFile()))
                 throw new FileNotFoundException("No such directory exists");
 
-            // TODO: Take share_lock on directory before getting listing.
             return dfsTree.get(directory).getList();
         }
     }
@@ -253,7 +300,6 @@ public class NamingServer implements Service, Registration
     public boolean createFile(Path file)
         throws RMIException, FileNotFoundException
     {
-        // TODO: Take share_lock on directory before getting listing.
         synchronized(dfsTree){
             if(file == null)
                 throw new NullPointerException("File path cannot be null");
@@ -278,7 +324,6 @@ public class NamingServer implements Service, Registration
                 }
 
                 dfsTree.put(file, obj);
-                // TODO: lock the parent before adding the file to its list?
                 dfsTree.get(file.parent()).addFile(file.last());
             }
             return true;
@@ -295,7 +340,6 @@ public class NamingServer implements Service, Registration
     @Override
     public boolean createDirectory(Path directory) throws FileNotFoundException
     {
-        // TODO: Take share_lock on directory before getting listing.
         synchronized(dfsTree){
             if(directory == null)
                 throw new NullPointerException("Directory path cannot be null");
@@ -312,7 +356,6 @@ public class NamingServer implements Service, Registration
             } else {
                 DfsObject obj = new DfsObject(directory, Ftype.DIRECTORY, Ltype.NOT_LOCKED);
                 dfsTree.put(directory, obj);
-                // TODO: lock the parent before adding the directory to its list?
                 dfsTree.get(directory.parent()).addFile(directory.last());
             }
 
@@ -334,7 +377,6 @@ public class NamingServer implements Service, Registration
             if (!dfsTree.containsKey(path))
                 throw new FileNotFoundException("No such file exists");
 
-            // TODO: Do we need to lock this object for exclusive access??
 
             DfsObject obj = dfsTree.get(path);
             ArrayList<Command> commands = null;
@@ -449,7 +491,6 @@ public class NamingServer implements Service, Registration
                     System.out.println("something fishy going on here!!");
                 }
 
-                // TODO: share lock/write lock the directory before reading its listings.
                 if (!obj.containsFile(lastPath))
                     obj.addFile(lastPath);
             }
