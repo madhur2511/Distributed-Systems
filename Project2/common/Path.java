@@ -21,6 +21,7 @@ import java.util.*;
  */
 public class Path implements Iterable<String>, Comparable<Path>, Serializable
 {
+    // local Variable to store absolute file path in Distributed File System
     private String pathString = "";
 
     /** Creates a new path which represents the root directory. */
@@ -40,6 +41,7 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
     */
     public Path(Path path, String component)
     {
+        // Basic checks
         if(component == null
         || component.isEmpty()
         || component.indexOf(':') != -1
@@ -129,6 +131,7 @@ public class Path implements Iterable<String>, Comparable<Path>, Serializable
         return returnPaths;
     }
 
+    // Method to generate all list strings of file Path from given Directory
     public static ArrayList<String> getAllFilesFromDirectory(File directory){
         ArrayList<String> result = new ArrayList<String>();
         File[] files = directory.listFiles();

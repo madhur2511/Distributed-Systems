@@ -17,17 +17,35 @@ import naming.*;
  */
 public class StorageServer implements Storage, Command
 {
+    // Variable used to store root of folder mounted
     private File localRoot;
+
+    // Port number for client Stub
     private int clientPort;
+
+    // Port number for command Stub
     private int commandPort;
+
+    // Skeleton instance for client Stub
     private StorageSkeleton stoSkeleton;
+
+    // Command Instance for Naming Server Stub
     private CommandSkeleton cmdSkeleton;
+
+    // Variable to register client Skeleton Stop
     private volatile boolean stoStopped;
+
+    // Variable to register Naming Server Skeleton Stop
     private volatile boolean cmdStopped;
+
+    // Interface to naming server
     private Registration naming_server;
+
+    // machine hostname
     private String hostname;
 
     // Override neccessary skeleton methods for storage server.
+    // Private Class for StorageServer Interface
     private class StorageSkeleton extends Skeleton<Storage> {
         public StorageSkeleton(Storage s, InetSocketAddress addr) {
             super(Storage.class, s, addr);
@@ -49,6 +67,7 @@ public class StorageServer implements Storage, Command
     }
 
     // Override neccessary skeleton methods for command server.
+    // Private class for Command Server Interface
     private class CommandSkeleton extends Skeleton<Command> {
         public CommandSkeleton(Command s, InetSocketAddress addr) {
             super(Command.class, s, addr);
@@ -85,6 +104,7 @@ public class StorageServer implements Storage, Command
     */
     public StorageServer(File root, int client_port, int command_port)
     {
+        // Basic checks
         if (root == null)
             throw new NullPointerException("Root is null");
 
@@ -123,6 +143,7 @@ public class StorageServer implements Storage, Command
 
     }
 
+    // method to delete empty directories, calling function is delete
     private synchronized void deleteEmptyDirs(File dir) {
         if (dir.isDirectory() == false)
             return;
@@ -160,6 +181,7 @@ public class StorageServer implements Storage, Command
     public synchronized void start(String hostname, Registration naming_server)
         throws RMIException, UnknownHostException, FileNotFoundException
     {
+        // Basic checks
         if (hostname == null)
             throw new UnknownHostException("Hostname given is null");
 
@@ -181,6 +203,7 @@ public class StorageServer implements Storage, Command
                 delete(delFiles[i]);
             }
 
+            // Pruning of replicated files and empty directories
             deleteEmptyDirs(localRoot);
         }
         catch (Exception e) {
@@ -212,6 +235,7 @@ public class StorageServer implements Storage, Command
     @Override
     public synchronized long size(Path file) throws FileNotFoundException
     {
+        // Basic checks
         if (file == null) {
             throw new NullPointerException("File path is null");
         }
@@ -226,6 +250,7 @@ public class StorageServer implements Storage, Command
     public synchronized byte[] read(Path file, long offset, int length)
         throws FileNotFoundException, IOException
     {
+        // Basic checks
         if (file == null) {
             throw new NullPointerException("File path is null");
         }
@@ -245,6 +270,7 @@ public class StorageServer implements Storage, Command
         byte[] result = new byte[length];
         RandomAccessFile raf = new RandomAccessFile(f, "r");
 
+        // Read from file
         raf.seek(offset);
         raf.readFully(result);
         return result;
@@ -254,6 +280,7 @@ public class StorageServer implements Storage, Command
     public synchronized void write(Path file, long offset, byte[] data)
         throws FileNotFoundException, IOException
     {
+        // Basic checks
         if (file == null) {
             throw new NullPointerException("File path is null");
         }
@@ -283,6 +310,7 @@ public class StorageServer implements Storage, Command
     @Override
     public synchronized boolean create(Path file)
     {
+        // Basic checks
         if (file == null) {
             throw new NullPointerException("File path is null");
         }
@@ -316,6 +344,7 @@ public class StorageServer implements Storage, Command
             return false;
         }
 
+        // Recursive delete for object is directory
         if (temp.isDirectory()) {
             for (String s : temp.list()) {
                 if (this.delete(new Path(path, s)) == false)
@@ -329,6 +358,7 @@ public class StorageServer implements Storage, Command
     public synchronized boolean copy(Path file, Storage server)
         throws RMIException, FileNotFoundException, IOException
     {
+        // Basic checks
         if (file == null) {
             throw new NullPointerException("File path is null");
         }
@@ -349,6 +379,7 @@ public class StorageServer implements Storage, Command
         int length = (int) Math.min(size, Integer.MAX_VALUE);
         byte[] data = new byte[length];
 
+        // Took care of overflow
         while (length > 0) {
             data = server.read(file, offset, length);
             this.write(file, offset, Arrays.copyOfRange(data, 0, length));
