@@ -1,0 +1,13 @@
+docker run -itd sequenceiq/hadoop-docker ./bin/bash
+
+docker exec -i -t insane_kowalevski /bin/bash
+
+docker ps -l
+
+docker commit 5bad08c48fc9 madhur2511/hadoop:vanilla
+
+docker login --username=madhur2511 --email=madhur2511@gmail.com
+
+docker push madhur2511/hadoop
+
+docker pull madhur2511/hadoop:vanilla
