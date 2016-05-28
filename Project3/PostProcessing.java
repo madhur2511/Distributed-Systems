@@ -1,10 +1,12 @@
 import java.io.*;
 import java.util.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 public class PostProcessing {
-	public static void readFile(String path) throws IOException{
-		List<String> lines = Files.readAllLines(Paths.get(path));
+	public static void processFile(String path) throws IOException{
+		List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+	
 		for(String line : lines)
 			System.out.println(line);
 		
@@ -19,14 +21,12 @@ public class PostProcessing {
 		System.out.println(total);
 		System.out.println(mostCommon);
 		System.out.println(count);
-		
-		
 	}
 	
 	public static int getTotalNumberOfBigrams(List<String> lines){
 		int total = 0;
 		for(String line : lines){
-			total += Integer.parseInt(line.split("\\s+")[1]);
+			total += Integer.parseInt(line.split("\t")[1]);
 		}
 		return total;
 	}
@@ -34,7 +34,7 @@ public class PostProcessing {
 	public static int getMostCommonBigram(List<String> lines){
 		int max = -1;
 		for(String line : lines){
-			int count = Integer.parseInt(line.split("\\s+")[1]);
+			int count = Integer.parseInt(line.split("\t")[1]);
 			max = max > count ? max : count;
 		}
 		return max;
@@ -45,7 +45,7 @@ public class PostProcessing {
 		String[] strLines = lines.toArray(new String[0]);
 	    Arrays.sort(strLines, new Comparator<String>() {
 	      public int compare(String s1, String s2) {
-	        return (Integer.parseInt(s2.split("\\s+")[1]) - Integer.parseInt(s1.split("\\s+")[1]));
+	        return (Integer.parseInt(s2.split("\t")[1]) - Integer.parseInt(s1.split("\t")[1]));
 	      }
 	    });
 	    
@@ -54,7 +54,7 @@ public class PostProcessing {
 	    }
 	    
 	    for(String line : strLines){
-	    	current += Integer.parseInt(line.split("\\s+")[1]);
+	    	current += Integer.parseInt(line.split("\t")[1]);
 	    	if(current >= total * 0.1){
 	    		count += 1;
 	    		break;
@@ -68,6 +68,6 @@ public class PostProcessing {
 	public static void main(String[] args) throws IOException {
 		String path = args[0];
 		if(path == null) throw new IOException("No file provided");				
-		PostProcessing.readFile(path); 
+		PostProcessing.processFile(path); 
 	}
 }
