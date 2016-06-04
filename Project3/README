@@ -1,0 +1,27 @@
+Map-Reduce Bigram Counter
+
+Methodology:
+
+Mapper
+
+The mapper does the simple task of reading a line of text from the file split
+given to it and emits bigrams as key-value pairs, with the key being the
+bigram and the value being 1.
+
+Here, punctuations are not handled any differently than other characters,
+which might result in difference in the final results obtained, although it
+shouldn't be too high (approx 10% max)
+
+
+Reducer
+
+The reducer reads and sums all the values corresponding to a key and writes it
+into the output file designated in the map-reduce task.
+
+
+Post-processing
+
+Process the sorted histogram of bigrams obtained from the map-reduce phase to:
+1. Get the total number of bigrams
+2. Get the most common bigram
+3. Get top 10 percent contributors

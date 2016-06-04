@@ -2,20 +2,23 @@
 N=4
 input=$1
 
-[ $# -eq 0 ] && { echo "USAGE: ./run.sh <relative-path-to-input-file>"; exit 1; }
+if [ $# -eq 0 ]; then
+    echo "$(tput setaf 1)USAGE: ./run.sh <relative-path-to-input-file>$(tput setaf 7)"
+
+    echo -e "\n Using the default local input file"
+    cp -f ./input_small.txt hadoop-master/files/input.txt
+else
+    cp -f $input hadoop-master/files/input.txt
+fi
 
 echo -e "\n Copying JAR and input files to master-image prep"
-
-cp -f $input hadoop-master/files/input.txt
-
 cp -f BigramCounter.jar hadoop-master/files/BigramCounter.jar
 
 echo -e "\n Removing past containers and images for Master and slave if any found"
-
 docker rm -f master >/dev/null
 
 i=1
-rm -f hadoop-master/files/slaves
+rm -f hadoop-master/files/slaves >/dev/null
 while [ $i -le $N ]
 do
     echo slave$i >> hadoop-master/files/slaves
